@@ -48,6 +48,15 @@ public class Board implements Serializable {
         shipList.add(ship);
     }
     
+    public Ship makeMove(Coordinate move) {
+        moves[move.getCol()][move.getRow()] = true;
+        Ship ship = theShips[move.getCol()][move.getRow()];
+        if(ship != null) {
+            ship.registerHit();
+        }
+        return ship;
+    }
+    
     public boolean canShipFit(Ship ship) {
         int shipCount = 0;
         for (Ship s : shipList) {

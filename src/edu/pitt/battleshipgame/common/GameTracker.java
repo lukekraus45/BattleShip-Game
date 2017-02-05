@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.pitt.battleshipgame.common.board.Board;
-import edu.pitt.battleshipgame.common.ships.Ship;
-import edu.pitt.battleshipgame.common.Serializer;
 
 public class GameTracker {
     public static final int MAX_PLAYERS = 2;
     private int registeredPlayers = 0;
     private ArrayList<Board> gameBoards;
+    private GameState state = GameState.INIT;
+    private int playerTurn = 0;
     Object lock;
     
     public GameTracker() {
@@ -29,13 +29,33 @@ public class GameTracker {
     }
 
     public void waitForPlayers(int playerID) {
-        System.out.println("Player " + playerID + " is waiting for other players");
-        while(registeredPlayers < 2) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                System.err.println("I can't sleep!'");
+        switch (state) {
+            case INIT:
+            {
+                System.out.println("Player " + playerID + " is waiting for other players");
+                while(registeredPlayers < MAX_PLAYERS) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        System.err.println(e + " I can't sleep!");
+                    }
+                }
+                state = GameState.PLAYING;
+                break;
             }
+            case PLAYING:
+            {
+                while(playerTurn != playerID) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        System.err.println(e + " I can't sleep!");
+                    }
+                }
+                break;
+            }
+            default:
+                break;
         }
     }
     
@@ -43,20 +63,18 @@ public class GameTracker {
         return gameBoards;
     }
     
-    public void registerBoard(int playerID, byte [] board) {
-        registerBoard(playerID, (Board)Serializer.fromByteArray(board));
+    public void setBoards(ArrayList<Board> boards) {
+        gameBoards = boards;
+        playerTurn = (playerTurn + 1) % registeredPlayers;
     }
     
-    public void registerBoard(int playerID, Board board) {
-        gameBoards.set(playerID, board);
-        System.out.println("GameTracker is registering a board for " + playerID);
-        for(Board boardItr : gameBoards) {
-            System.out.println(boardItr.getName() + ":");
-            System.out.println(boardItr);
-            System.out.println("The ShipList looks like:");
-            for(Ship ship : boardItr.getShipList()) {
-                System.out.println(ship.getName());
+    public boolean isGameOver() {
+        System.out.println("Checking if the game is over...");
+        for(Board board : gameBoards) {
+            if(board.areAllShipsSunk()) {
+                return true;
             }
         }
+        return false;
     }
 }

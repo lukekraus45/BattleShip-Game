@@ -26,30 +26,28 @@ public abstract class Ship implements Serializable {
     private int hitCount;
     // Keep a backreference to the board that this ship is placed on
     private Board myBoard = null;
-    private LinkedList<Coordinate> myCoordinates;
+    Coordinate start, end;
     
     public Ship(Coordinate start, Coordinate end, Board board) {
-        myCoordinates = new LinkedList<Coordinate>();
-        if (start.getRow() == end.getRow()) {
-            // This ship is oriented column wise
-            for (int i = start.getCol(); i <= end.getCol(); i++) {
-                myCoordinates.add(new Coordinate(start.getRow(),i));
-            }
-        } else {
-            // This ship is oriented length wise
-            for (int i = start.getRow(); i <= end.getRow(); i++) {
-                myCoordinates.add(new Coordinate(i, start.getCol()));
-            }
-        }
-        // Make sure calculated length matches the length from the ship
-        if (myCoordinates.size() != getLength()) {
-            throw new IllegalArgumentException("The ship spans more squares than allowed.");
-        }
+        this.start = start;
+        this.end = end;
         addBoard(board);
     }
     
     public List<Coordinate> getCoordinates() {
-        return myCoordinates;
+        LinkedList coordinates = new LinkedList<Coordinate>();
+        if (start.getRow() == end.getRow()) {
+            // This ship is oriented column wise
+            for (int i = start.getCol(); i <= end.getCol(); i++) {
+                coordinates.add(new Coordinate(start.getRow(),i));
+            }
+        } else {
+            // This ship is oriented length wise
+            for (int i = start.getRow(); i <= end.getRow(); i++) {
+                coordinates.add(new Coordinate(i, start.getCol()));
+            }
+        }
+        return coordinates;
     }
     
     public boolean isSunk() {
@@ -64,6 +62,11 @@ public abstract class Ship implements Serializable {
         }
         board.addShip(this);
     }
+    
+    public void registerHit() {
+        hitCount++;
+    }
+    
     /**
      * Get the length of this ship instance.
      * @return 

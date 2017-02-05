@@ -3,23 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/board/Coordinate.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/Ship.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/Battleship.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ServerInterface.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/GameInterface.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/Destroyer.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/Cruiser.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/server/ServerWrapper.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/GameTracker.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/client/Client.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/board/Board.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/ShipFactory.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/endpoint/ServerPublisher.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/Serializer.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/Carrier.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/common/ships/Submarine.java</file>
-            <file>file:/C:/Users/jungl_000/Google%20Drive%20-%20Work/CS%201632/BattleshipGame/src/edu/pitt/battleshipgame/client/ClientWrapper.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/client/Client.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/server/ServerWrapper.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/common/GameTracker.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/common/ServerInterface.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/common/ships/Ship.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/client/ClientWrapper.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/common/GameState.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/common/GameInterface.java</file>
+            <file>file:/C:/Users/jungl_000/Repos/master/src/edu/pitt/battleshipgame/common/board/Board.java</file>
         </group>
     </open-files>
 </project-private>

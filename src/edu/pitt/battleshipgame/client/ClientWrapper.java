@@ -5,11 +5,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import edu.pitt.battleshipgame.common.Serializer;
 import edu.pitt.battleshipgame.common.board.*;
-import edu.pitt.battleshipgame.common.ships.*;
 import edu.pitt.battleshipgame.common.*;
 
 public class ClientWrapper implements GameInterface {
@@ -21,7 +19,7 @@ public class ClientWrapper implements GameInterface {
         try {
             url = new URL("http://localhost:9999/battleship?wsdl");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
         QName qname = new QName("http://server.battleshipgame.pitt.edu/", "ServerWrapperService");
         Service service = Service.create(url, qname);
@@ -32,23 +30,31 @@ public class ClientWrapper implements GameInterface {
         serverInterface = getServer();
     }
     
+    @Override
     public int registerPlayer() {
         return serverInterface.registerPlayer();
     }
     
-    public void waitForPlayers(int playerID) {
+    @Override
+    public void wait(int playerID) {
         serverInterface.waitForPlayers(playerID);
     }
     
-    public void registerBoard(int playerID, Board board) {
-        serverInterface.registerBoard(playerID, Serializer.toByteArray(board));
+    @Override
+    public void setBoards(ArrayList<Board> boards) {
+        serverInterface.setBoards(Serializer.toByteArray(boards));
     }
     
     /**
      * Client side wrapper around the 
      * @return 
      */
+    @Override
     public ArrayList<Board> getBoards() {
         return (ArrayList<Board>) Serializer.fromByteArray(serverInterface.getBoards());
+    }
+    
+    public boolean isGameOver() {
+        return serverInterface.isGameOver();
     }
 }
