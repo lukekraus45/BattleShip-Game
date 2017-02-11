@@ -35,9 +35,9 @@ public class Client {
         for(Ship.ShipType type : Ship.ShipType.values()) {
             if(type != Ship.ShipType.NONE) {
                 System.out.println("Please enter a start coordinate to place your " + ShipFactory.getNameFromType(type));
-                Coordinate start = new Coordinate(scan.nextLine());
+                Coordinate start = new Coordinate(scan.nextLine().toLowerCase());
                 System.out.println("Please enter an end coordinate to place your " + ShipFactory.getNameFromType(type));
-                Coordinate end = new Coordinate(scan.nextLine());
+                Coordinate end = new Coordinate(scan.nextLine().toLowerCase());
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
                 ShipFactory.newShipFromType(type, start, end, board);
@@ -53,7 +53,7 @@ public class Client {
             // Get the updated boards
             gameBoards = gi.getBoards();
             System.out.println("Where would you like to place your move?");
-            Coordinate move = new Coordinate(scan.nextLine());
+            Coordinate move = new Coordinate(scan.nextLine().toLowerCase());
             Ship ship = gameBoards.get((myPlayerID + 1) % GameTracker.MAX_PLAYERS).makeMove(move);
             if(ship == null) {
                 System.out.println("Miss");

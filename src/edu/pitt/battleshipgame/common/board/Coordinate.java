@@ -9,22 +9,22 @@ public class Coordinate implements Serializable {
     private static final String formattingRules = "Coordinate format must be <A-J>:<0-9>";
     // Support for mapping from letters to numbers...
     private static final HashMap<Character,Integer> columnMap = new HashMap<Character, Integer>(){{
-            put('A',0);
-            put('B',1);
-            put('C',2);
-            put('D',3);
-            put('E',4);
-            put('F',5);
-            put('G',6);
-            put('H',7);
-            put('I',8);
-            put('J',9);
+            put('a',0);
+            put('b',1);
+            put('c',2);
+            put('d',3);
+            put('e',4);
+            put('f',5);
+            put('g',6);
+            put('h',7);
+            put('i',8);
+            put('j',9);
         }
     };
 
     // Support for mapping from numbers to letters
     private static final char [] reverseColumnMap =
-        { 'A','B','C','D','E','F','G','H','I','J'};
+        { 'a','b','c','d','e','f','g','h','i','j'};
     
     /**
      * A simple constructor that calls setCoordinates below.
@@ -45,6 +45,8 @@ public class Coordinate implements Serializable {
      */
     public void setCoordinates(String coord) throws IllegalArgumentException {
         if (coord.length() != 3) {
+            
+
             throw new IllegalArgumentException(formattingRules);
         }
         
