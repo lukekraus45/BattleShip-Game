@@ -37,15 +37,22 @@ public class GraphicalClient extends Application
     
     private void initialize()
     {
-        GridPane grid = GenerateGrid();
-        grid.getChildren().add(GenerateMenuBar());
-        this.scene = GenerateScene(grid);
+        GridPane masterGrid = GenerateMasterGrid();
+        masterGrid.getChildren().add(GenerateMenuBar());
+        masterGrid.getChildren().add(GenerateGrid());
+        this.scene = GenerateScene(masterGrid);
     }
     
     private Scene GenerateScene(Parent parent)
     {
         Scene scene = new Scene(parent, 800, 450);
         return scene;
+    }
+    
+    private GridPane GenerateMasterGrid()
+    {
+        GridPane grid = new GridPane();
+        return grid;
     }
     
     private GridPane GenerateGrid()
