@@ -5,16 +5,22 @@
  */
 package edu.pitt.battleshipgame.client;
 
+import edu.pitt.battleshipgame.common.ships.Ship;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
@@ -22,6 +28,7 @@ public class GraphicalClient extends Application
 {
     private Scene scene;
     private Stage primaryStage;
+    private GridPane grid;
     
     @Override
     public void start(Stage primaryStage)
@@ -37,10 +44,13 @@ public class GraphicalClient extends Application
     
     private void initialize()
     {
-        GridPane masterGrid = GenerateMasterGrid();
-        masterGrid.getChildren().add(GenerateMenuBar());
-        masterGrid.getChildren().add(GenerateGrid());
-        this.scene = GenerateScene(masterGrid);
+        this.grid = GenerateGrid();
+        this.grid.add(GeneratePlacementButtonGrid(), 0, 2);
+        BorderPane masterPane = GenerateMasterPane();
+        masterPane.setTop(GenerateMenuBar());
+        masterPane.setCenter(this.grid);
+        this.scene = GenerateScene(masterPane);
+        //this.scene = GenerateScene(this.grid);
     }
     
     private Scene GenerateScene(Parent parent)
@@ -49,10 +59,10 @@ public class GraphicalClient extends Application
         return scene;
     }
     
-    private GridPane GenerateMasterGrid()
+    private BorderPane GenerateMasterPane()
     {
-        GridPane grid = new GridPane();
-        return grid;
+        BorderPane pane = new BorderPane();
+        return pane;
     }
     
     private GridPane GenerateGrid()
@@ -61,10 +71,16 @@ public class GraphicalClient extends Application
         RowConstraints rowConstraints = new RowConstraints();
         rowConstraints.setPercentHeight(10);
         grid.getRowConstraints().add(rowConstraints);
+        rowConstraints = new RowConstraints();
         rowConstraints.setPercentHeight(80);
         grid.getRowConstraints().add(rowConstraints);
+        rowConstraints = new RowConstraints();
         rowConstraints.setPercentHeight(10);
         grid.getRowConstraints().add(rowConstraints);
+        ColumnConstraints columnConstraint = new ColumnConstraints();
+        columnConstraint.setPercentWidth(100);
+        grid.getColumnConstraints().add(columnConstraint);
+        grid.setGridLinesVisible(true);
         return grid;
     }
     
@@ -77,6 +93,18 @@ public class GraphicalClient extends Application
         {
             grid.getColumnConstraints().add(columnConstraints);
         }
+        
+        int i = 0;
+        for (Ship.ShipType ship : Ship.ShipType.values())
+        {
+            if (ship != Ship.ShipType.NONE)
+            {
+                Button shipButton = GenerateButton(ship.name());
+                grid.add(shipButton, i, 0);
+                i++;
+            }
+        }
+        
         return grid;
     }
     
@@ -84,6 +112,10 @@ public class GraphicalClient extends Application
     {
         Button button = new Button();
         button.setText(text);
+        GridPane.setFillWidth(button, true);
+        GridPane.setFillHeight(button, true);
+        button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        button.setAlignment(Pos.BOTTOM_CENTER);
         return button;
     }
     
