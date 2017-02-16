@@ -60,6 +60,7 @@ public abstract class Ship implements Serializable {
         } else {
             throw new IllegalArgumentException("This ship is already placed on a board: " + myBoard.getName());
         }
+      board.addShip(this);
     }
     
     public void registerHit() {

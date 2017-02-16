@@ -15,6 +15,7 @@ public class Board implements Serializable {
     //private ArrayList < ArrayList < Ship > > theShips;
     private Ship [][] theShips;
     private boolean [][] moves;
+    private boolean [][] occupied;
     // Keep a list of all ships on this board for quick searching.
     LinkedList<Ship> shipList;
     private String name;
@@ -39,6 +40,7 @@ public class Board implements Serializable {
             //if not occupied you can add the ship otherwise tell them to reenter the coordinates
             //theShips[coord.getRow()][coord.getCol()] = ship;
             occupied[coord.getRow()][coord.getCol()] = true;
+           
             }else{
             
             return false;
