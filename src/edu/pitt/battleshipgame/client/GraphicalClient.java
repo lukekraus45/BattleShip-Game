@@ -38,8 +38,8 @@ public class GraphicalClient extends Application
     private Scene scene;
     private Stage primaryStage;
     private GridPane grid;
-    private BorderPane ourBoard;
-    private BorderPane theirBoard;
+    private GraphicalBoard ourBoard;
+    private GraphicalBoard theirBoard;
     
     @Override
     public void start(Stage primaryStage)
@@ -145,75 +145,15 @@ public class GraphicalClient extends Application
         rowConstraint.setPercentHeight(100);
         grid.getRowConstraints().add(rowConstraint);
         
-        this.ourBoard = GenerateBoard("Your Board");
-        this.theirBoard = GenerateBoard("Opponent's Board");
-        grid.add(this.ourBoard, 0, 0);
-        grid.add(this.theirBoard, 1, 0);
+        this.ourBoard = new GraphicalBoard("Your Board");
+        this.theirBoard = new GraphicalBoard("Opponent's Board");
+        grid.add(this.ourBoard.getBoard(), 0, 0);
+        grid.add(this.theirBoard.getBoard(), 1, 0);
         
         return grid;
     }
     
-    private BorderPane GenerateBoard(String title)
-    {
-        BorderPane pane = new BorderPane();
-        
-        Label titleLabel = new Label(title);
-        titleLabel.setMaxWidth(Double.MAX_VALUE);
-        titleLabel.setAlignment(Pos.CENTER);
-        titleLabel.setContentDisplay(ContentDisplay.CENTER);
-        pane.setTop(titleLabel);
-        
-        GridPane board = new GridPane();
-        ConstrainBoard(board);
-        LabelBoard(board);
-        ColorBoard(board);
-        pane.setCenter(board);
-        
-        return pane;
-    }
     
-    private void ColorBoard(GridPane board)
-    {
-        for (int row = 1; row <= 10; row++)
-        {
-            for (int col = 1; col <= 10; col++)
-            {
-                Pane square = new Pane();
-                square.setBackground(new Background(new BackgroundFill(Color.web("#1f00bc"), CornerRadii.EMPTY, Insets.EMPTY)));
-                square.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-                board.add(square, row, col);
-            }
-        }
-    }
-    
-    private void LabelBoard(GridPane board)
-    {
-        char column = 'A';
-        for (int i = 1; i <= 10; i++, column++)
-        {
-            Label rowLabel = new Label(String.valueOf(i));
-            Label columnLabel = new Label(String.valueOf(column));
-            rowLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            columnLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            rowLabel.setAlignment(Pos.CENTER_RIGHT);
-            columnLabel.setAlignment(Pos.BOTTOM_CENTER);
-            board.add(rowLabel, 0, i);
-            board.add(columnLabel, i, 0);
-        }
-    }
-    
-    private void ConstrainBoard(GridPane board)
-    {
-        RowConstraints rowConstraints = new RowConstraints();
-        ColumnConstraints columnConstraints = new ColumnConstraints();
-        rowConstraints.setPercentHeight(10);
-        columnConstraints.setPercentWidth(10);
-        for (int i = 0; i < 11; i++)
-        {
-            board.getRowConstraints().add(rowConstraints);
-            board.getColumnConstraints().add(columnConstraints);
-        }
-    }
     
     private MenuBar GenerateMenuBar()
     {
@@ -248,5 +188,127 @@ public class GraphicalClient extends Application
     public static void main(String[] args)
     {
         launch(args);
+    }
+}
+
+class GraphicalBoard
+{
+    private final BorderPane board;
+    private final Pane[][] cells;
+    private final String blue = "#1f00bc";
+    private final String grey = "#8e8e8e";
+    private final String red = "#c60b0b";
+    private final String black = "#2b2525";
+    
+    GraphicalBoard(String title)
+    {
+        cells = new Pane[10][10];
+        this.board = GenerateBoard(title);
+    }
+    
+    public BorderPane getBoard()
+    {
+        return this.board;
+    }
+    
+    private BorderPane GenerateBoard(String title)
+    {
+        BorderPane pane = new BorderPane();
+        
+        Label titleLabel = new Label(title);
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+        titleLabel.setAlignment(Pos.CENTER);
+        titleLabel.setContentDisplay(ContentDisplay.CENTER);
+        pane.setTop(titleLabel);
+        
+        GridPane board = new GridPane();
+        ConstrainBoard(board);
+        LabelBoard(board);
+        ColorBoard(board);
+        pane.setCenter(board);
+        
+        return pane;
+    }
+    
+    private void ColorBoard(GridPane board)
+    {
+        for (int row = 1; row <= 10; row++)
+        {
+            for (int col = 1; col <= 10; col++)
+            {
+                Pane square = new Pane();
+                SetCellColor(square, this.blue);
+                square.setBorder(new Border(new BorderStroke(Color.BLACK,
+                        BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                cells[row-1][col-1] = square;
+                board.add(square, row, col);
+            }
+        }
+    }
+    
+    private void LabelBoard(GridPane board)
+    {
+        char column = 'A';
+        for (int i = 1; i <= 10; i++, column++)
+        {
+            Label rowLabel = new Label(String.valueOf(i));
+            Label columnLabel = new Label(String.valueOf(column));
+            rowLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            columnLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            rowLabel.setAlignment(Pos.CENTER_RIGHT);
+            columnLabel.setAlignment(Pos.BOTTOM_CENTER);
+            board.add(rowLabel, 0, i);
+            board.add(columnLabel, i, 0);
+        }
+    }
+    
+    private void ConstrainBoard(GridPane board)
+    {
+        RowConstraints rowConstraints = new RowConstraints();
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        rowConstraints.setPercentHeight(10);
+        columnConstraints.setPercentWidth(10);
+        for (int i = 0; i < 11; i++)
+        {
+            board.getRowConstraints().add(rowConstraints);
+            board.getColumnConstraints().add(columnConstraints);
+        }
+    }
+    
+    private void SetCellColor(Pane cell, String color)
+    {
+        cell.setBackground(new Background(new BackgroundFill(Color.web(color), CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+    
+    /**
+     * @param row 0 indexed row
+     * @param col 0 indexed column
+     */
+    public void setCellType(CellType type, int row, int col)
+    {
+        Pane cell = this.cells[row][col];
+        switch (type)
+        {
+            case WATER:
+                SetCellColor(cell, this.blue);
+                break;
+            case HIT:
+                SetCellColor(cell, this.red);
+                break;
+            case MISS:
+                SetCellColor(cell, this.black);
+                break;
+            case SHIP:
+                SetCellColor(cell, this.grey);
+                break;
+        }
+    }
+    
+    public enum CellType
+    {
+        WATER,
+        HIT,
+        MISS,
+        SHIP
     }
 }
