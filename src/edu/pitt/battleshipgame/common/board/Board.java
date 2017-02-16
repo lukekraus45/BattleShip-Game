@@ -15,6 +15,7 @@ public class Board implements Serializable {
     //private ArrayList < ArrayList < Ship > > theShips;
     private Ship [][] theShips;
     private boolean [][] moves;
+    private boolean [][] occupied;
     // Keep a list of all ships on this board for quick searching.
     LinkedList<Ship> shipList;
     private String name;
@@ -22,6 +23,7 @@ public class Board implements Serializable {
     public Board (String _name) {
         theShips = new Ship[BOARD_DIM][BOARD_DIM];
         moves = new boolean[BOARD_DIM][BOARD_DIM];
+        occupied = new boolean[BOARD_DIM][BOARD_DIM];
         shipList = new LinkedList<Ship>();
         name = _name;
     }
@@ -29,15 +31,45 @@ public class Board implements Serializable {
     public String getName() {
         return name;
     }
+    public boolean can_addShip(Ship ship){
+     if (!canShipFit(ship)) {
+            throw new IllegalArgumentException("This board already has the maximum amount of: " + ship.getName());
+        }
+        for (Coordinate coord : ship.getCoordinates()){
+            if(!occupied[coord.getRow()][coord.getCol()]){
+            //if not occupied you can add the ship otherwise tell them to reenter the coordinates
+            //theShips[coord.getRow()][coord.getCol()] = ship;
+            occupied[coord.getRow()][coord.getCol()] = true;
+           
+            }else{
+            
+            return false;
+            }
+        }
+        
+        return true;
+    }
+    
     
     public void addShip(Ship ship) {
         if (!canShipFit(ship)) {
             throw new IllegalArgumentException("This board already has the maximum amount of: " + ship.getName());
         }
-        for (Coordinate coord : ship.getCoordinates()){
-            theShips[coord.getRow()][coord.getCol()] = ship;
+        if(!can_addShip(ship)){
+            throw new IllegalArgumentException("Ship already has been placed there");
         }
+        
+        for (Coordinate coord : ship.getCoordinates()){
+            if(!occupied[coord.getRow()][coord.getCol()]){
+            //if not occupied you can add the ship otherwise tell them to reenter the coordinates
+            theShips[coord.getRow()][coord.getCol()] = ship;
+            occupied[coord.getRow()][coord.getCol()] = true;
+            }
+        }
+        
         shipList.add(ship);
+       
+       
     }
     
     public Ship makeMove(Coordinate move) {
