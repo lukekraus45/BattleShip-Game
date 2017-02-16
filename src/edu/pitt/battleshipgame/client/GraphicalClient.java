@@ -8,6 +8,7 @@ package edu.pitt.battleshipgame.client;
 import edu.pitt.battleshipgame.common.ships.Ship;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,10 +18,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class GraphicalClient extends Application
@@ -82,7 +92,6 @@ public class GraphicalClient extends Application
         ColumnConstraints columnConstraint = new ColumnConstraints();
         columnConstraint.setPercentWidth(100);
         grid.getColumnConstraints().add(columnConstraint);
-        grid.setGridLinesVisible(true);
         return grid;
     }
     
@@ -141,7 +150,6 @@ public class GraphicalClient extends Application
         grid.add(this.ourBoard, 0, 0);
         grid.add(this.theirBoard, 1, 0);
         
-        grid.setGridLinesVisible(true);
         return grid;
     }
     
@@ -158,9 +166,24 @@ public class GraphicalClient extends Application
         GridPane board = new GridPane();
         ConstrainBoard(board);
         LabelBoard(board);
+        ColorBoard(board);
         pane.setCenter(board);
         
         return pane;
+    }
+    
+    private void ColorBoard(GridPane board)
+    {
+        for (int row = 1; row <= 10; row++)
+        {
+            for (int col = 1; col <= 10; col++)
+            {
+                Pane square = new Pane();
+                square.setBackground(new Background(new BackgroundFill(Color.web("#1f00bc"), CornerRadii.EMPTY, Insets.EMPTY)));
+                square.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                board.add(square, row, col);
+            }
+        }
     }
     
     private void LabelBoard(GridPane board)
