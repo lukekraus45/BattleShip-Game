@@ -8,9 +8,11 @@ package edu.pitt.battleshipgame.client;
 import edu.pitt.battleshipgame.common.ships.Ship;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -146,7 +148,12 @@ public class GraphicalClient extends Application
     private BorderPane GenerateBoard(String title)
     {
         BorderPane pane = new BorderPane();
-        pane.setTop(new Label(title));
+        
+        Label titleLabel = new Label(title);
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+        titleLabel.setAlignment(Pos.CENTER);
+        titleLabel.setContentDisplay(ContentDisplay.CENTER);
+        pane.setTop(titleLabel);
         
         GridPane board = new GridPane();
         ConstrainBoard(board);
@@ -161,8 +168,14 @@ public class GraphicalClient extends Application
         char column = 'A';
         for (int i = 1; i <= 10; i++, column++)
         {
-            board.add(new Label(String.valueOf(i)), 0, i);
-            board.add(new Label(String.valueOf(column)), i, 0);
+            Label rowLabel = new Label(String.valueOf(i));
+            Label columnLabel = new Label(String.valueOf(column));
+            rowLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            columnLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            rowLabel.setAlignment(Pos.CENTER_RIGHT);
+            columnLabel.setAlignment(Pos.BOTTOM_CENTER);
+            board.add(rowLabel, 0, i);
+            board.add(columnLabel, i, 0);
         }
     }
     
