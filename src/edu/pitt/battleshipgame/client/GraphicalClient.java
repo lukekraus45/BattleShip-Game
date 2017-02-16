@@ -7,6 +7,9 @@ package edu.pitt.battleshipgame.client;
 
 import edu.pitt.battleshipgame.common.ships.Ship;
 import javafx.application.Application;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,6 +34,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class GraphicalClient extends Application
@@ -40,6 +44,8 @@ public class GraphicalClient extends Application
     private GridPane grid;
     private GraphicalBoard ourBoard;
     private GraphicalBoard theirBoard;
+    private StringProperty prompt;
+    private GamePhase phase;
     
     @Override
     public void start(Stage primaryStage)
@@ -48,17 +54,20 @@ public class GraphicalClient extends Application
         initialize();
         primaryStage.setTitle("Battleship");
         primaryStage.setScene(this.scene);
-        primaryStage.setMinHeight(250);
-        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(400);
+        primaryStage.setMinWidth(500);
         primaryStage.show();
     }
     
     private void initialize()
     {
+        this.prompt = new SimpleStringProperty();
+        this.phase = GamePhase.MATCHMAKING;
         this.grid = GenerateGrid();
         this.grid.add(GeneratePlacementButtonGrid(), 0, 2);
-        GridPane boardPane = GenerateBoardPane();
-        this.grid.add(boardPane, 0, 1);
+        this.grid.add(GenerateBoardPane(), 0, 1);
+        this.grid.add(GeneratePrompt(), 0, 0);
+        UpdatePrompt();
         BorderPane masterPane = GenerateMasterPane();
         masterPane.setTop(GenerateMenuBar());
         masterPane.setCenter(this.grid);
@@ -95,12 +104,42 @@ public class GraphicalClient extends Application
         return grid;
     }
     
+    private Label GeneratePrompt()
+    {
+        Label prompt = new Label();
+        prompt.textProperty().bind(this.prompt);
+        prompt.setMaxWidth(Double.MAX_VALUE);
+        prompt.setAlignment(Pos.CENTER);
+        prompt.setContentDisplay(ContentDisplay.CENTER);
+        prompt.setFont(new Font("Regular",20));
+        return prompt;
+    }
+    
+    private void UpdatePrompt()
+    {
+        switch (this.phase)
+        {
+            case MATCHMAKING:
+                this.prompt.set("Please wait while a match is made");
+                break;
+            case PLACEMENT:
+                this.prompt.set("Please place your ships");
+                break;
+            case FIRING:
+                this.prompt.set("Please choose a cell to fire on");
+                break;
+            case WAITING:
+                this.prompt.set("Please wait while your opponent chooses a cell to fire on");
+                break;
+        }
+    }
+    
     private GridPane GeneratePlacementButtonGrid()
     {
         GridPane grid = new GridPane();
         ColumnConstraints columnConstraints = new ColumnConstraints();
         columnConstraints.setPercentWidth(20);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
         {
             grid.getColumnConstraints().add(columnConstraints);
         }
@@ -118,6 +157,8 @@ public class GraphicalClient extends Application
                 i++;
             }
         }
+        Button doneButton = GenerateButton("DONE");
+        grid.add(doneButton, 5, 0);
         
         return grid;
     }
@@ -180,6 +221,14 @@ public class GraphicalClient extends Application
     private void quit(ActionEvent e)
     {
         //TODO
+    }
+    
+    enum GamePhase
+    {
+        MATCHMAKING,
+        PLACEMENT,
+        FIRING,
+        WAITING
     }
 
     /**
