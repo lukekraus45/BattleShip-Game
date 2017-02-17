@@ -341,9 +341,12 @@ public  class GraphicalClient extends Application implements EventHandler<Action
      */
     public static void main(String[] args)
     {
+        myPlayerID = -1;
+        System.out.println(myPlayerID);
          gi = new ClientWrapper();
         myPlayerID = gi.registerPlayer();
-        if(myPlayerID != 0){
+        System.out.println(myPlayerID);
+        if(myPlayerID >= 0){
             connection_made = true;
         }
         
