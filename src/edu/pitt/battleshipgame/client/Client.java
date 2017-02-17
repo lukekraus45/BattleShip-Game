@@ -15,12 +15,11 @@ public class Client {
     public static Scanner scan = new Scanner(System.in);
     
     public static void main(String [] args) {
-        GraphicalClient gui = new GraphicalClient();
+        
        
         gi = new ClientWrapper();
         myPlayerID = gi.registerPlayer();
-        gui.changePhase(GraphicalClient.GamePhase.PLACEMENT);
-        gui.UpdatePrompt();
+        
         System.out.println("You have registered as Player " + myPlayerID);
         System.out.println("Please wait for other players to join");
         gi.wait(myPlayerID);

@@ -5,14 +5,14 @@
  */
 package edu.pitt.battleshipgame.client;
 
+import static edu.pitt.battleshipgame.client.Client.gi;
+import static edu.pitt.battleshipgame.client.Client.myPlayerID;
 import edu.pitt.battleshipgame.common.GameInterface;
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.ships.Ship;
-<<<<<<< HEAD
 import java.util.ArrayList;
-=======
 import java.util.EventListener;
->>>>>>> 52badc70138974082e8117a26f264143509f6a38
+
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -56,16 +56,13 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     private GraphicalBoard theirBoard;
     private StringProperty prompt;
     private GamePhase phase;
-<<<<<<< HEAD
     public static GameInterface gi;
     public static int myPlayerID;
     public static ArrayList<Board> gameBoards;
     Button doneButton;
-=======
     private Pane[][] ourCells;
     private Pane[][] theirCells;
->>>>>>> 52badc70138974082e8117a26f264143509f6a38
-    
+    static boolean connection_made = false;
     @Override
     public void start(Stage primaryStage)
     {   
@@ -76,7 +73,9 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         primaryStage.setMinHeight(400);
         primaryStage.setMinWidth(500);
         primaryStage.show();
-        
+        if(connection_made){
+        prompt.set("Connection has been made");
+        }
     }
     
     @Override
@@ -342,8 +341,14 @@ public  class GraphicalClient extends Application implements EventHandler<Action
      */
     public static void main(String[] args)
     {
-        launch(args);
+         gi = new ClientWrapper();
+        myPlayerID = gi.registerPlayer();
+        if(myPlayerID != 0){
+            connection_made = true;
+        }
         
+        launch(args);
+       
   
     }
 }
