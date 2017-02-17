@@ -34,12 +34,23 @@ public class Client {
         System.out.println(board.toString(true));
         for(Ship.ShipType type : Ship.ShipType.values()) {
             if(type != Ship.ShipType.NONE) {
+                boolean is_coordinate_illegal = true;
+                Coordinate start = null,end = null;
+                while(is_coordinate_illegal){
+                    
+                is_coordinate_illegal = false;
                 System.out.println("Please enter a start coordinate to place your " + ShipFactory.getNameFromType(type));
-                Coordinate start = new Coordinate(scan.nextLine().toLowerCase());
+                start = new Coordinate(scan.nextLine().toLowerCase());
                 System.out.println("Please enter an end coordinate to place your " + ShipFactory.getNameFromType(type));
-                Coordinate end = new Coordinate(scan.nextLine().toLowerCase());
+                
+                end = new Coordinate(scan.nextLine().toLowerCase());
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
+                if(start.getRow() == end.getRow() && start.getCol() == end.getCol()){
+                System.out.println("You cannot place a ship at the same location as its origin");
+                is_coordinate_illegal = true;
+                }
+                }
                 ShipFactory.newShipFromType(type, start, end, board);
             }
         }
