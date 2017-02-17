@@ -8,11 +8,17 @@ package edu.pitt.battleshipgame.client;
 import edu.pitt.battleshipgame.common.GameInterface;
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.ships.Ship;
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+import java.util.EventListener;
+>>>>>>> 52badc70138974082e8117a26f264143509f6a38
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -23,6 +29,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -49,10 +56,15 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     private GraphicalBoard theirBoard;
     private StringProperty prompt;
     private GamePhase phase;
+<<<<<<< HEAD
     public static GameInterface gi;
     public static int myPlayerID;
     public static ArrayList<Board> gameBoards;
     Button doneButton;
+=======
+    private Pane[][] ourCells;
+    private Pane[][] theirCells;
+>>>>>>> 52badc70138974082e8117a26f264143509f6a38
     
     @Override
     public void start(Stage primaryStage)
@@ -177,6 +189,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
             if (ship != Ship.ShipType.NONE)
             {
                 Button shipButton = GenerateButton(ship.name());
+                AddShipButtonListener(shipButton, ship);
                 grid.add(shipButton, i, 0);
                 i++;
             }
@@ -185,6 +198,32 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         grid.add(doneButton, 5, 0);
         
         return grid;
+    }
+    
+    private void AddDoneButtonListener(Button button)
+    {
+        button.setOnAction((ActionEvent event) ->
+        {
+           //TODO
+           //check that all ships are placed
+           //then, move the the firing phase
+        });
+    }
+    
+    private void AddShipButtonListener(Button button, Ship.ShipType type)
+    {
+        button.setOnAction((ActionEvent event) ->
+        {
+            ShipButtonClicked(type);
+        });
+    }
+    
+    private void ShipButtonClicked(Ship.ShipType type)
+    {
+        //TODO
+        //should only be activated during placement phase, as buttons should be disabled during all other phases
+        //if the ship is not placed, click should set the corresponding ship as the one being placed
+        //if the ship is placed, click should remove the ship from the board.
     }
     
     private Button GenerateButton(String text)
@@ -212,13 +251,48 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         
         this.ourBoard = new GraphicalBoard("Your Board");
         this.theirBoard = new GraphicalBoard("Opponent's Board");
+        this.ourCells = this.ourBoard.getCells();
+        this.theirCells = this.ourBoard.getCells();
         grid.add(this.ourBoard.getBoard(), 0, 0);
         grid.add(this.theirBoard.getBoard(), 1, 0);
         
         return grid;
     }
     
+    private void AddCellListeners(Pane[][] cells)
+    {
+        for (int row = 0; row < 10; row++)
+        {
+            for (int col = 0; col < 10; col++)
+            {
+                final int x = row;
+                final int y = col;
+                cells[row][col].setOnMouseClicked((MouseEvent event) ->
+                {
+                    CellClicked(x, y);
+                });
+            }
+        }
+    }
     
+    private void RemoveCellListeners(Pane[][] cells)
+    {
+        for (int row = 0; row < 10; row++)
+        {
+            for (int col = 0; col < 10; col++)
+            {
+                cells[row][col].setOnMouseClicked(null);
+            }
+        }
+    }
+    
+    private void CellClicked(int row, int col)
+    {
+        //TODO
+        //Action should depend upon game state
+        //if the cell is clicked during the placement phase, the click originates from ourBoard
+        //if the sell is clicked during the firing phase, the cell originates from theirBoard
+    }
     
     private MenuBar GenerateMenuBar()
     {
@@ -254,6 +328,14 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         FIRING,
         WAITING
     }
+    
+    private void UpdateGamePhase()
+    {
+        //TODO
+        //update game based on phase
+        //disable/enable buttons, listners, etc.
+        //change prompt
+    }
 
     /**
      * @param args the command line arguments
@@ -286,6 +368,11 @@ class GraphicalBoard
         return this.board;
     }
     
+    public Pane[][] getCells()
+    {
+        return this.cells;
+    }
+    
     private BorderPane GenerateBoard(String title)
     {
         BorderPane pane = new BorderPane();
@@ -315,7 +402,7 @@ class GraphicalBoard
                 SetCellColor(square, this.blue);
                 square.setBorder(new Border(new BorderStroke(Color.BLACK,
                         BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-                cells[row-1][col-1] = square;
+                this.cells[row-1][col-1] = square;
                 board.add(square, row, col);
             }
         }
