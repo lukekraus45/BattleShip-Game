@@ -5,9 +5,11 @@
  */
 package edu.pitt.battleshipgame.client;
 
+import edu.pitt.battleshipgame.common.GameInterface;
+import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.ships.Ship;
+import java.util.ArrayList;
 import javafx.application.Application;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
@@ -36,8 +38,9 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.event.EventHandler;
 
-public class GraphicalClient extends Application
+public  class GraphicalClient extends Application implements EventHandler<ActionEvent>
 {
     private Scene scene;
     private Stage primaryStage;
@@ -46,6 +49,10 @@ public class GraphicalClient extends Application
     private GraphicalBoard theirBoard;
     private StringProperty prompt;
     private GamePhase phase;
+    public static GameInterface gi;
+    public static int myPlayerID;
+    public static ArrayList<Board> gameBoards;
+    Button doneButton;
     
     @Override
     public void start(Stage primaryStage)
@@ -57,6 +64,16 @@ public class GraphicalClient extends Application
         primaryStage.setMinHeight(400);
         primaryStage.setMinWidth(500);
         primaryStage.show();
+        
+    }
+    
+    @Override
+    public void handle(ActionEvent event){
+    
+        if(event.getSource() == doneButton){
+            System.out.println("done button works");
+        }
+        
     }
     
     private void initialize()
@@ -73,6 +90,8 @@ public class GraphicalClient extends Application
         masterPane.setCenter(this.grid);
         this.scene = GenerateScene(masterPane);
     }
+    
+    
     
     private Scene GenerateScene(Parent parent)
     {
@@ -115,7 +134,12 @@ public class GraphicalClient extends Application
         return prompt;
     }
     
-    private void UpdatePrompt()
+  public void changePhase(GamePhase p){
+   this.phase = p;
+      
+  }
+        
+    public void UpdatePrompt()
     {
         switch (this.phase)
         {
@@ -157,7 +181,7 @@ public class GraphicalClient extends Application
                 i++;
             }
         }
-        Button doneButton = GenerateButton("DONE");
+        doneButton = GenerateButton("DONE");
         grid.add(doneButton, 5, 0);
         
         return grid;
@@ -237,6 +261,8 @@ public class GraphicalClient extends Application
     public static void main(String[] args)
     {
         launch(args);
+        
+  
     }
 }
 
