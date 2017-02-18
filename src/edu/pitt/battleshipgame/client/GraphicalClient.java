@@ -5,11 +5,16 @@
  */
 package edu.pitt.battleshipgame.client;
 
+import static edu.pitt.battleshipgame.client.Client.gameBoards;
 import static edu.pitt.battleshipgame.client.Client.gi;
 import static edu.pitt.battleshipgame.client.Client.myPlayerID;
+import static edu.pitt.battleshipgame.client.Client.placeShips;
+import static edu.pitt.battleshipgame.client.Client.scan;
 import edu.pitt.battleshipgame.common.GameInterface;
 import edu.pitt.battleshipgame.common.board.Board;
+import edu.pitt.battleshipgame.common.board.Coordinate;
 import edu.pitt.battleshipgame.common.ships.Ship;
+import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
 import java.util.EventListener;
 
@@ -63,6 +68,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     private Pane[][] ourCells;
     private Pane[][] theirCells;
     static boolean connection_made = false;
+    private static int global_row,global_col;
     @Override
     public void start(Stage primaryStage)
     {   
@@ -223,6 +229,8 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //should only be activated during placement phase, as buttons should be disabled during all other phases
         //if the ship is not placed, click should set the corresponding ship as the one being placed
         //if the ship is placed, click should remove the ship from the board.
+        placeShips(gameBoards.get(myPlayerID) , type);
+        AddCellListeners(ourCells);
     }
     
     private Button GenerateButton(String text)
@@ -258,7 +266,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         return grid;
     }
     
-    private void AddCellListeners(Pane[][] cells)
+    private void AddCellListeners(Pane [][] cells)
     {
         for (int row = 0; row < 10; row++)
         {
@@ -291,6 +299,9 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //Action should depend upon game state
         //if the cell is clicked during the placement phase, the click originates from ourBoard
         //if the sell is clicked during the firing phase, the cell originates from theirBoard
+        global_row=  row;
+        global_col = col;
+        //System.out.println("ROW " + row + " COL: " + col);
     }
     
     private MenuBar GenerateMenuBar()
@@ -335,17 +346,40 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //disable/enable buttons, listners, etc.
         //change prompt
     }
-
+  public static void placeShips(Board board,Ship.ShipType type) {
+        
+        /*
+      
+      
+        Should wait to see what button is pressed (ship type). Whatever ship type is pressed it should set the start coordinate to the cell that is clicked into
+        The end point should be the cell that is clicked next. After these two values are computed the ship should be placed on the board. (Not sure how we want to go about this
+        We could make an actual ship graphic (not sure how difficult that will be) or an easier way would be to just color the cells different colors (ex. red for desroyer yellow
+        for battleship etc.) 
+      
+      */
+      
+            if(type != Ship.ShipType.NONE) {
+                
+                Coordinate start = new Coordinate(global_col,global_row);
+                System.out.println(start.toString());
+                //Coordinate end = new Coordinate(scan.nextLine().toLowerCase());
+                // We don't need to track a reference to the ship since it will be
+                // on the board.
+                //ShipFactory.newShipFromType(type, start, end, board);
+            }
+        
+    }
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args)
     {
         myPlayerID = -1;
-        System.out.println(myPlayerID);
+        
          gi = new ClientWrapper();
         myPlayerID = gi.registerPlayer();
-        System.out.println(myPlayerID);
+        gameBoards = gi.getBoards();
+        //placeShips(gameBoards.get(myPlayerID));
         if(myPlayerID >= 0){
             connection_made = true;
         }
