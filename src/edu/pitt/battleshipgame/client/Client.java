@@ -66,7 +66,7 @@ public class Client {
             }
             // Send the updated boards.
             gi.setBoards(gameBoards);
-        } while(!gi.isGameOver());
+        } while(gi.isGameOver());
         System.out.println("The Game is Over!");
     }
 }

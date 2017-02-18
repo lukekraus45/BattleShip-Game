@@ -60,10 +60,10 @@ public class Board implements Serializable {
         }
         
         for (Coordinate coord : ship.getCoordinates()){
-             System.out.println(coord.getRow() + " , " + coord.getCol());
+             
             
-            //if not occupied you can add the ship otherwise tell them to reenter the coordinates
-            System.out.println(coord.getRow() + " , " + coord.getCol());
+            
+           
             theShips[coord.getRow()][coord.getCol()] = ship;
             occupied[coord.getRow()][coord.getCol()] = true;
             
