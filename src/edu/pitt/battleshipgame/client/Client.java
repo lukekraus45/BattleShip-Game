@@ -41,6 +41,7 @@ public class Client {
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
                 ShipFactory.newShipFromType(type, start, end, board);
+                
             }
         }
     }
@@ -54,7 +55,7 @@ public class Client {
             gameBoards = gi.getBoards();
             System.out.println("Where would you like to place your move?");
             Coordinate move = new Coordinate(scan.nextLine().toLowerCase());
-            Ship ship = gameBoards.get((myPlayerID + 1) % GameTracker.MAX_PLAYERS).makeMove(move);
+            Ship ship = gameBoards.get((myPlayerID +1) % GameTracker.MAX_PLAYERS).makeMove(move);
             if(ship == null) {
                 System.out.println("Miss");
             } else if (ship.isSunk()) {

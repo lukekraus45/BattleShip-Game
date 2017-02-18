@@ -60,11 +60,13 @@ public class Board implements Serializable {
         }
         
         for (Coordinate coord : ship.getCoordinates()){
-            if(!occupied[coord.getRow()][coord.getCol()]){
+             System.out.println(coord.getRow() + " , " + coord.getCol());
+            
             //if not occupied you can add the ship otherwise tell them to reenter the coordinates
+            System.out.println(coord.getRow() + " , " + coord.getCol());
             theShips[coord.getRow()][coord.getCol()] = ship;
             occupied[coord.getRow()][coord.getCol()] = true;
-            }
+            
         }
         
         shipList.add(ship);
@@ -73,15 +75,16 @@ public class Board implements Serializable {
     }
     
     public Ship makeMove(Coordinate move) {
-        if( moves[move.getCol()][move.getRow()] == true){
+        if( moves[move.getRow()][move.getCol()] == true){
         throw new IllegalArgumentException("already guessed this location");
                 
         }
-        moves[move.getCol()][move.getRow()] = true;
-        Ship ship = theShips[move.getCol()][move.getRow()];
+        moves[move.getRow()][move.getCol()] = true;
+        Ship ship = theShips[move.getRow()][move.getCol()];
         if(ship != null) {
             ship.registerHit();
         }
+       
         return ship;
     }
     
