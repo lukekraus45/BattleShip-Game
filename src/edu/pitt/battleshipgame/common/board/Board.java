@@ -51,25 +51,41 @@ public class Board implements Serializable {
     }
     
     
-    public void addShip(Ship ship) {
+     public void addShip(Ship ship) {
+        boolean fail = false;//checks to see if the add ship fails for some reason. If it does, dont add it and set the values back to null
+        int length = 0;
         if (!canShipFit(ship)) {
             throw new IllegalArgumentException("This board already has the maximum amount of: " + ship.getName());
         }
-        if(!can_addShip(ship)){
+         if(!can_addShip(ship)){
             throw new IllegalArgumentException("Ship already has been placed there");
         }
         
         for (Coordinate coord : ship.getCoordinates()){
-            if(!occupied[coord.getRow()][coord.getCol()]){
+            length++;
+             if(!occupied[coord.getRow()][coord.getCol()]){
             //if not occupied you can add the ship otherwise tell them to reenter the coordinates
             theShips[coord.getRow()][coord.getCol()] = ship;
             occupied[coord.getRow()][coord.getCol()] = true;
             }
         }
         
-        shipList.add(ship);
-       
-       
+        if(length != ship.getLength()){
+        fail = true;
+        }
+        if(fail){
+        //if ship adding fails for some reason set them all to null rather than the ship
+        for (Coordinate coord : ship.getCoordinates()){
+            
+            theShips[coord.getRow()][coord.getCol()] = null;
+            occupied[coord.getRow()][coord.getCol()] = false;
+        
+        }
+        throw new IllegalArgumentException("Ship is of wrong length. Expected ship length is " + ship.getLength());
+        }
+        if(!fail){
+            shipList.add(ship);
+        }
     }
     
     public Ship makeMove(Coordinate move) {
