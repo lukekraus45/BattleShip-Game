@@ -73,6 +73,10 @@ public class Board implements Serializable {
     }
     
     public Ship makeMove(Coordinate move) {
+        if( moves[move.getCol()][move.getRow()] == true){
+        throw new IllegalArgumentException("already guessed this location");
+                
+        }
         moves[move.getCol()][move.getRow()] = true;
         Ship ship = theShips[move.getCol()][move.getRow()];
         if(ship != null) {

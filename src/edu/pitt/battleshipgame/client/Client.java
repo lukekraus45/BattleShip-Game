@@ -61,6 +61,7 @@ public class Client {
                 System.out.println("You sunk " + ship.getName());
             } else {
                 System.out.println("Hit");
+               
             }
             // Send the updated boards.
             gi.setBoards(gameBoards);
