@@ -68,7 +68,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     private Pane[][] ourCells;
     private Pane[][] theirCells;
     static boolean connection_made = false;
-    private static int global_row,global_col;
+    
     @Override
     public void start(Stage primaryStage)
     {   
@@ -299,9 +299,13 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //Action should depend upon game state
         //if the cell is clicked during the placement phase, the click originates from ourBoard
         //if the sell is clicked during the firing phase, the cell originates from theirBoard
-        global_row=  row;
-        global_col = col;
-        //System.out.println("ROW " + row + " COL: " + col);
+       //The above logic should be worked out by the caller function. For example if the method that is calling
+        //it is supposed to place ships than it will be our cells and if it is to guess a coordinate it would be theircells
+        //In otherwords we don't need to worry about gamestate here, but rather in some other method 
+        
+
+        Coordinate temp = new Coordinate(col,row);
+        System.out.println(temp.toString());
     }
     
     private MenuBar GenerateMenuBar()
@@ -360,8 +364,10 @@ public  class GraphicalClient extends Application implements EventHandler<Action
       
             if(type != Ship.ShipType.NONE) {
                 
-                Coordinate start = new Coordinate(global_col,global_row);
-                System.out.println(start.toString());
+                
+    
+                //Coordinate start = new Coordinate(global_col,global_row);
+                //System.out.println(start.toString());
                 //Coordinate end = new Coordinate(scan.nextLine().toLowerCase());
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
