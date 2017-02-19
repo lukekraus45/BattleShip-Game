@@ -9,16 +9,16 @@ public class Coordinate implements Serializable {
     private static final String formattingRules = "Coordinate format must be <A-J>:<0-9>";
     // Support for mapping from letters to numbers...
     private static final HashMap<Character,Integer> columnMap = new HashMap<Character, Integer>(){{
-            put('a',0);
-            put('b',1);
-            put('c',2);
-            put('d',3);
-            put('e',4);
-            put('f',5);
-            put('g',6);
-            put('h',7);
-            put('i',8);
-            put('j',9);
+            put('a',1);
+            put('b',2);
+            put('c',3);
+            put('d',4);
+            put('e',5);
+            put('f',6);
+            put('g',7);
+            put('h',8);
+            put('i',9);
+            put('j',10);
         }
     };
 
@@ -44,7 +44,7 @@ public class Coordinate implements Serializable {
      * before it gets to the server.
      */
     public void setCoordinates(String coord) throws IllegalArgumentException {
-        if (coord.length() != 3) {
+        if (coord.length() < 3 || coord.length() > 4) {
             
 
             throw new IllegalArgumentException(formattingRules);
