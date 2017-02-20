@@ -55,7 +55,7 @@ public  class GraphicalClient extends Application
     private GraphicalBoard ourBoard;
     private GraphicalBoard theirBoard;
     private StringProperty prompt;
-    private GamePhase phase;
+    private GamePhase phase = GamePhase.CONNECTING;
     public static GameInterface gi;
     public static int myPlayerID;
     public static ArrayList<Board> gameBoards;
@@ -83,34 +83,21 @@ public  class GraphicalClient extends Application
     
     private void RunGetServerTask()
     {
-//        Platform.runLater( () ->
-//        {
-            Task task = new Task<Void>() {
-                @Override public Void call() {
-                    ConnectToServer();
-                    return null;
-                }
-            };
-            new Thread(task).start();
-//        });
-        
-//        Task task = new Task<Void>() {
-//            @Override public Void call() {
-//                Platform.runLater( () ->
-//                {
-//                    ConnectToServer();
-//                });
-//                return null;
-//            }
-//        };
-//        new Thread(task).start();
+        Task task = new Task<Void>() {
+            @Override public Void call() {
+                ConnectToServer();
+                return null;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
     
     private void initialize()
     {
         this.shipButtons = new HashMap<>();
         this.prompt = new SimpleStringProperty();
-        this.phase = GamePhase.CONNECTING;
         this.grid = GenerateGrid();
         this.grid.add(GeneratePlacementButtonGrid(), 0, 2);
         this.grid.add(GenerateBoardPane(), 0, 1);
@@ -121,6 +108,7 @@ public  class GraphicalClient extends Application
         masterPane.setCenter(this.grid);
         this.scene = GenerateScene(masterPane);
         this.myPlayerID = -1;
+        UpdateGamePhase(this.phase);
     }
        
     private Scene GenerateScene(Parent parent)
@@ -226,9 +214,9 @@ public  class GraphicalClient extends Application
         });
     }
     
-    private void AddShipButtonListeners(HashMap<Ship.ShipType, Button> shipButtons)
+    private void AddShipButtonListeners()
     {
-        for (HashMap.Entry entry : shipButtons.entrySet())
+        for (HashMap.Entry entry : this.shipButtons.entrySet())
         {
             ((Button)entry.getValue()).setOnAction((ActionEvent event) ->
             {
@@ -237,9 +225,9 @@ public  class GraphicalClient extends Application
         }
     }
     
-    private void RemoveShipButtonListeners(HashMap<Ship.ShipType, Button> shipButtons)
+    private void RemoveShipButtonListeners()
     {
-        for (HashMap.Entry entry : shipButtons.entrySet())
+        for (HashMap.Entry entry : this.shipButtons.entrySet())
         {
             ((Button)entry.getValue()).setOnAction(null);
         }
@@ -314,14 +302,13 @@ public  class GraphicalClient extends Application
         }
     }
     
-    private void EnableButtons()
+    private void EnableButtons(boolean enable)
     {
-        
-    }
-    
-    private void DisableButtons()
-    {
-        
+        for (HashMap.Entry entry : this.shipButtons.entrySet())
+        {
+            ((Button)entry.getValue()).setDisable(!enable);
+        }
+        this.doneButton.setDisable(!enable);
     }
     
     private void CellClicked(int row, int col)
@@ -394,32 +381,37 @@ public  class GraphicalClient extends Application
         //disable/enable buttons, listners, etc.
         this.phase = phase;
         UpdatePrompt();
-        UpdateCellListeners(phase);
+        UpdateCellListenersAndButtons(phase);
     }
     
-    private void UpdateCellListeners(GamePhase phase)
+    private void UpdateCellListenersAndButtons(GamePhase phase)
     {
         switch (phase)
         {
             case CONNECTING:
                 RemoveCellListeners(this.theirCells);
                 RemoveCellListeners(this.ourCells);
+                EnableButtons(false);
                 break;
             case MATCHMAKING:
                 RemoveCellListeners(this.theirCells);
                 RemoveCellListeners(this.ourCells);
+                EnableButtons(false);
                 break;
             case PLACEMENT:
                 RemoveCellListeners(this.theirCells);
                 AddCellListeners(this.ourCells);
+                EnableButtons(true);
                 break;
             case FIRING:
                 RemoveCellListeners(this.ourCells);
                 AddCellListeners(this.theirCells);
+                EnableButtons(false);
                 break;
             case WAITING:
                 RemoveCellListeners(this.theirCells);
                 RemoveCellListeners(this.ourCells);
+                EnableButtons(false);
                 break;
         }
     }
@@ -495,14 +487,17 @@ public  class GraphicalClient extends Application
                 {
                     throw causeGot;
                 }
-            }
-            try
-            {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException e)
-            {
-                //do nothing
+                else
+                {
+                    try
+                    {
+                        Thread.sleep(500);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        //do nothing
+                    }
+                }
             }
         }
         Platform.runLater( () ->
@@ -513,9 +508,6 @@ public  class GraphicalClient extends Application
         });
     }
   
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args)
     {   
         launch(args); 
