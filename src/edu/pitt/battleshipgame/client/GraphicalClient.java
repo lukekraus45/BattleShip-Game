@@ -234,7 +234,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //if the ship is placed, click should remove the ship from the board.
         AddCellListeners(ourCells);
         this.UpdateGamePhase(GamePhase.PLACEMENT);
-        current_ship = type;
+        current_ship = type; 
         
         
         
@@ -372,7 +372,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //change prompt
         this.phase = game_phase; 
     }
-  public static void placeShips(Board board,Ship.ShipType type) {
+  public void placeShips(Board board,Ship.ShipType type) {
         
         /*
       
@@ -398,6 +398,22 @@ public  class GraphicalClient extends Application implements EventHandler<Action
                 global_start = null;
                 global_end = null;
                 
+                int length;
+                if(start.getRow() == end.getRow()){
+                //if the start and end row are the same then they will be horizontal
+                length = Math.abs(end.getCol() - start.getCol());
+                for(int i = 0; i <= length; i++){
+                ourBoard.setCellType(GraphicalBoard.CellType.SHIP, start.getRow()+i, start.getCol());
+                }
+                
+                }
+                else if(start.getCol() == end.getCol()){
+                //if the start and end col are the same they will be vertical
+                length = Math.abs(end.getRow() - start.getRow());
+                for(int i = 0; i <= length; i++){
+                ourBoard.setCellType(GraphicalBoard.CellType.SHIP, start.getRow(), start.getCol()+i);
+                }
+                }
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
                 ShipFactory.newShipFromType(type, start, end, board);
@@ -438,7 +454,7 @@ class GraphicalBoard
     GraphicalBoard(String title)
     {
         cells = new Pane[10][10];
-        this.board = GenerateBoard(title);
+        board = GenerateBoard(title);
     }
     
     public BorderPane getBoard()
