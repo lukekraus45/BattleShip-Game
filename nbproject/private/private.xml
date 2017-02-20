@@ -10,10 +10,15 @@
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/board/Board.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ServerInterface.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ships/ShipFactory.java</file>
+            <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/server/ServerWrapper.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/GameTracker.java</file>
+            <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ships/Cruiser.java</file>
+            <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ships/Destroyer.java</file>
+            <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ships/Submarine.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/GameInterface.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ships/Carrier.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/Serializer.java</file>
+            <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/endpoint/ServerPublisher.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/client/GraphicalClient.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/GameState.java</file>
             <file>file:/C:/Users/Luke/Google%20Drive/CS%201632/CS_1632_31078_group9/src/edu/pitt/battleshipgame/client/ClientWrapper.java</file>

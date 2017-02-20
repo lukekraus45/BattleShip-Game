@@ -68,6 +68,9 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     private Pane[][] ourCells;
     private Pane[][] theirCells;
     static boolean connection_made = false;
+    static Ship.ShipType current_ship;
+    static Coordinate  global_start = null, global_end = null;
+    static boolean start_or_end = false; //if false then the next value is start and if true then the next cell is the end. Used for placing ships
     
     @Override
     public void start(Stage primaryStage)
@@ -229,8 +232,12 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //should only be activated during placement phase, as buttons should be disabled during all other phases
         //if the ship is not placed, click should set the corresponding ship as the one being placed
         //if the ship is placed, click should remove the ship from the board.
-        placeShips(gameBoards.get(myPlayerID) , type);
         AddCellListeners(ourCells);
+        this.UpdateGamePhase(GamePhase.PLACEMENT);
+        current_ship = type;
+        
+        
+        
     }
     
     private Button GenerateButton(String text)
@@ -303,10 +310,24 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //it is supposed to place ships than it will be our cells and if it is to guess a coordinate it would be theircells
         //In otherwords we don't need to worry about gamestate here, but rather in some other method 
         
-
-        Coordinate temp = new Coordinate(col,row);
-        System.out.println(temp.toString());
+        if(start_or_end){
+        //if true then the coordinate that is being placed is the end coordintate. This means that the start coordinate would have already been clicked
+        start_or_end = false;
+        global_end = new Coordinate(col,row);
+        }else{
+        start_or_end = true;
+        global_start = new Coordinate(col,row);
+        }
+        
+        if(this.phase == GamePhase.PLACEMENT){
+        
+            while(global_start != null && global_end != null){
+            placeShips(gameBoards.get(myPlayerID) , current_ship);
+            }
+        }
     }
+    
+  
     
     private MenuBar GenerateMenuBar()
     {
@@ -343,12 +364,13 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         WAITING
     }
     
-    private void UpdateGamePhase()
+    private void UpdateGamePhase(GamePhase game_phase)
     {
         //TODO
         //update game based on phase
         //disable/enable buttons, listners, etc.
         //change prompt
+        this.phase = game_phase; 
     }
   public static void placeShips(Board board,Ship.ShipType type) {
         
@@ -362,18 +384,26 @@ public  class GraphicalClient extends Application implements EventHandler<Action
       
       */
       
+          
             if(type != Ship.ShipType.NONE) {
                 
                 
-    
-                //Coordinate start = new Coordinate(global_col,global_row);
-                //System.out.println(start.toString());
-                //Coordinate end = new Coordinate(scan.nextLine().toLowerCase());
+               
+                
+                Coordinate start = global_start;
+                System.out.println("Start " + start.toString());
+               
+                Coordinate end = global_end;
+                System.out.println("End " + end.toString());
+                global_start = null;
+                global_end = null;
+                
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
-                //ShipFactory.newShipFromType(type, start, end, board);
-            }
-        
+                ShipFactory.newShipFromType(type, start, end, board);
+                
+          
+      }
     }
     /**
      * @param args the command line arguments
