@@ -5,25 +5,17 @@
  */
 package edu.pitt.battleshipgame.client;
 
-import static edu.pitt.battleshipgame.client.Client.gameBoards;
-import static edu.pitt.battleshipgame.client.Client.gi;
-import static edu.pitt.battleshipgame.client.Client.myPlayerID;
-import static edu.pitt.battleshipgame.client.Client.placeShips;
-import static edu.pitt.battleshipgame.client.Client.scan;
 import edu.pitt.battleshipgame.common.GameInterface;
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.board.Coordinate;
 import edu.pitt.battleshipgame.common.ships.Ship;
 import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
-import java.util.EventListener;
-
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -82,9 +74,12 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         primaryStage.setMinHeight(400);
         primaryStage.setMinWidth(500);
         primaryStage.show();
-        if(connection_made){
-        prompt.set("Connection has been made");
-        }
+        
+        Platform.runLater( () ->
+        {
+            ConnectToServer();
+        });
+
     }
     
     @Override
@@ -99,7 +94,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     private void initialize()
     {
         this.prompt = new SimpleStringProperty();
-        this.phase = GamePhase.MATCHMAKING;
+        this.phase = GamePhase.CONNECTING;
         this.grid = GenerateGrid();
         this.grid.add(GeneratePlacementButtonGrid(), 0, 2);
         this.grid.add(GenerateBoardPane(), 0, 1);
@@ -109,6 +104,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         masterPane.setTop(GenerateMenuBar());
         masterPane.setCenter(this.grid);
         this.scene = GenerateScene(masterPane);
+        this.myPlayerID = -1;
     }
     
     
@@ -163,6 +159,9 @@ public  class GraphicalClient extends Application implements EventHandler<Action
     {
         switch (this.phase)
         {
+            case CONNECTING:
+                this.prompt.set("Please wait while we connect to the server");
+                break;
             case MATCHMAKING:
                 this.prompt.set("Please wait while a match is made");
                 break;
@@ -233,11 +232,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //if the ship is not placed, click should set the corresponding ship as the one being placed
         //if the ship is placed, click should remove the ship from the board.
         AddCellListeners(ourCells);
-        this.UpdateGamePhase(GamePhase.PLACEMENT);
-        current_ship = type; 
-        
-        
-        
+        current_ship = type;        
     }
     
     private Button GenerateButton(String text)
@@ -361,7 +356,8 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         MATCHMAKING,
         PLACEMENT,
         FIRING,
-        WAITING
+        WAITING,
+        CONNECTING
     }
     
     private void UpdateGamePhase(GamePhase game_phase)
@@ -369,10 +365,11 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //TODO
         //update game based on phase
         //disable/enable buttons, listners, etc.
-        //change prompt
-        this.phase = game_phase; 
+        this.phase = game_phase;
+        UpdatePrompt();
     }
-  public void placeShips(Board board,Ship.ShipType type) {
+    
+    private void placeShips(Board board,Ship.ShipType type) {
         
         /*
       
@@ -421,24 +418,41 @@ public  class GraphicalClient extends Application implements EventHandler<Action
           
       }
     }
+  
+    private void ConnectToServer()
+    {
+        while (true)
+        {
+            try
+            {
+                gi = new ClientWrapper();
+                break;
+            }
+            catch (Throwable causeGot)
+            {
+                Throwable cause = causeGot;
+                Throwable rootCause;
+                while (null != (rootCause = cause.getCause())  && (rootCause != cause))
+                {
+                    cause = rootCause;
+                }
+                if (!(cause instanceof java.net.ConnectException))
+                {
+                    throw causeGot;
+                }
+            }
+        }
+        myPlayerID = gi.registerPlayer();
+        gameBoards = gi.getBoards();
+        UpdateGamePhase(GamePhase.MATCHMAKING);
+    }
+  
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args)
-    {
-        myPlayerID = -1;
-        
-         gi = new ClientWrapper();
-        myPlayerID = gi.registerPlayer();
-        gameBoards = gi.getBoards();
-        //placeShips(gameBoards.get(myPlayerID));
-        if(myPlayerID >= 0){
-            connection_made = true;
-        }
-        
-        launch(args);
-       
-  
+    {   
+        launch(args); 
     }
 }
 
