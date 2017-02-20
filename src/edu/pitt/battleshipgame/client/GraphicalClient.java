@@ -11,20 +11,22 @@ import edu.pitt.battleshipgame.common.board.Coordinate;
 import edu.pitt.battleshipgame.common.ships.Ship;
 import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Iterator;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -67,17 +69,14 @@ public  class GraphicalClient extends Application
     static boolean start_or_end = false; //if false then the next value is start and if true then the next cell is the end. Used for placing ships
     private HashMap<Ship.ShipType, Button> shipButtons;
     private Button doneButton;
+    private MenuItem surrender;
     
     @Override
     public void start(Stage primaryStage)
     {   
         this.primaryStage = primaryStage;
         initialize();
-        primaryStage.setTitle("Battleship");
-        primaryStage.setScene(this.scene);
-        primaryStage.setMinHeight(400);
-        primaryStage.setMinWidth(500);
-        primaryStage.show();
+        this.primaryStage.show();
         RunGetServerTask();
     }
     
@@ -109,6 +108,11 @@ public  class GraphicalClient extends Application
         this.scene = GenerateScene(masterPane);
         this.myPlayerID = -1;
         UpdateGamePhase(this.phase);
+        this.primaryStage.setTitle("Battleship");
+        this.primaryStage.setScene(this.scene);
+        this.primaryStage.setMinHeight(400);
+        this.primaryStage.setMinWidth(500);
+        this.primaryStage.setOnCloseRequest(this::quit);
     }
        
     private Scene GenerateScene(Parent parent)
@@ -239,7 +243,7 @@ public  class GraphicalClient extends Application
         //should only be activated during placement phase, as buttons should be disabled during all other phases
         //if the ship is not placed, click should set the corresponding ship as the one being placed
         //if the ship is placed, click should remove the ship from the board.
-        current_ship = type;        
+        this.current_ship = type;        
     }
     
     private Button GenerateButton(String text)
@@ -340,8 +344,8 @@ public  class GraphicalClient extends Application
     
     private MenuBar GenerateMenuBar()
     {
-        MenuItem surrender = new MenuItem("Surrender");
-        surrender.setOnAction(this::surrender);
+        this.surrender = new MenuItem("Surrender");
+        this.surrender.setOnAction(this::surrender);
         
         MenuItem quit = new MenuItem("Quit");
         quit.setOnAction(this::quit);
@@ -360,9 +364,20 @@ public  class GraphicalClient extends Application
         //TODO
     }
     
-    private void quit(ActionEvent e)
+    private void quit(Event e)
     {
         //TODO
+        final String confirmText = "Are you sure that you want to quit?";
+        Alert confirm = new Alert(AlertType.CONFIRMATION, confirmText, ButtonType.CANCEL, ButtonType.OK);
+        confirm.showAndWait();
+        if (confirm.getResult() == ButtonType.CANCEL)
+        {
+            
+        }
+        else if (confirm.getResult() == ButtonType.OK)
+        {
+            
+        }
     }
     
     enum GamePhase
@@ -381,37 +396,37 @@ public  class GraphicalClient extends Application
         //disable/enable buttons, listners, etc.
         this.phase = phase;
         UpdatePrompt();
-        UpdateCellListenersAndButtons(phase);
-    }
-    
-    private void UpdateCellListenersAndButtons(GamePhase phase)
-    {
         switch (phase)
         {
             case CONNECTING:
                 RemoveCellListeners(this.theirCells);
                 RemoveCellListeners(this.ourCells);
                 EnableButtons(false);
+                this.surrender.setDisable(true);
                 break;
             case MATCHMAKING:
                 RemoveCellListeners(this.theirCells);
                 RemoveCellListeners(this.ourCells);
                 EnableButtons(false);
+                this.surrender.setDisable(true);
                 break;
             case PLACEMENT:
                 RemoveCellListeners(this.theirCells);
                 AddCellListeners(this.ourCells);
                 EnableButtons(true);
+                this.surrender.setDisable(false);
                 break;
             case FIRING:
                 RemoveCellListeners(this.ourCells);
                 AddCellListeners(this.theirCells);
                 EnableButtons(false);
+                this.surrender.setDisable(false);
                 break;
             case WAITING:
                 RemoveCellListeners(this.theirCells);
                 RemoveCellListeners(this.ourCells);
                 EnableButtons(false);
+                this.surrender.setDisable(false);
                 break;
         }
     }
