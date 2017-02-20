@@ -11,10 +11,14 @@ import edu.pitt.battleshipgame.common.board.Coordinate;
 import edu.pitt.battleshipgame.common.ships.Ship;
 import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Iterator;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -55,13 +59,14 @@ public  class GraphicalClient extends Application
     public static GameInterface gi;
     public static int myPlayerID;
     public static ArrayList<Board> gameBoards;
-    Button doneButton;
     private Pane[][] ourCells;
     private Pane[][] theirCells;
     static boolean connection_made = false;
     static Ship.ShipType current_ship;
     static Coordinate  global_start = null, global_end = null;
     static boolean start_or_end = false; //if false then the next value is start and if true then the next cell is the end. Used for placing ships
+    private HashMap<Ship.ShipType, Button> shipButtons;
+    private Button doneButton;
     
     @Override
     public void start(Stage primaryStage)
@@ -73,14 +78,37 @@ public  class GraphicalClient extends Application
         primaryStage.setMinHeight(400);
         primaryStage.setMinWidth(500);
         primaryStage.show();
-        Platform.runLater( () ->
-        {
-            ConnectToServer();
-        });
+        RunGetServerTask();
+    }
+    
+    private void RunGetServerTask()
+    {
+//        Platform.runLater( () ->
+//        {
+            Task task = new Task<Void>() {
+                @Override public Void call() {
+                    ConnectToServer();
+                    return null;
+                }
+            };
+            new Thread(task).start();
+//        });
+        
+//        Task task = new Task<Void>() {
+//            @Override public Void call() {
+//                Platform.runLater( () ->
+//                {
+//                    ConnectToServer();
+//                });
+//                return null;
+//            }
+//        };
+//        new Thread(task).start();
     }
     
     private void initialize()
     {
+        this.shipButtons = new HashMap<>();
         this.prompt = new SimpleStringProperty();
         this.phase = GamePhase.CONNECTING;
         this.grid = GenerateGrid();
@@ -177,13 +205,13 @@ public  class GraphicalClient extends Application
             if (ship != Ship.ShipType.NONE)
             {
                 Button shipButton = GenerateButton(ship.name());
-                AddShipButtonListener(shipButton, ship);
                 grid.add(shipButton, i, 0);
+                this.shipButtons.put(ship, shipButton);
                 i++;
             }
         }
-        doneButton = GenerateButton("DONE");
-        grid.add(doneButton, 5, 0);
+        this.doneButton = GenerateButton("DONE");
+        grid.add(this.doneButton, 5, 0);
         
         return grid;
     }
@@ -198,12 +226,23 @@ public  class GraphicalClient extends Application
         });
     }
     
-    private void AddShipButtonListener(Button button, Ship.ShipType type)
+    private void AddShipButtonListeners(HashMap<Ship.ShipType, Button> shipButtons)
     {
-        button.setOnAction((ActionEvent event) ->
+        for (HashMap.Entry entry : shipButtons.entrySet())
         {
-            ShipButtonClicked(type);
-        });
+            ((Button)entry.getValue()).setOnAction((ActionEvent event) ->
+            {
+                ShipButtonClicked((Ship.ShipType)entry.getKey());
+            });
+        }
+    }
+    
+    private void RemoveShipButtonListeners(HashMap<Ship.ShipType, Button> shipButtons)
+    {
+        for (HashMap.Entry entry : shipButtons.entrySet())
+        {
+            ((Button)entry.getValue()).setOnAction(null);
+        }
     }
     
     private void ShipButtonClicked(Ship.ShipType type)
@@ -273,6 +312,16 @@ public  class GraphicalClient extends Application
                 cells[row][col].setOnMouseClicked(null);
             }
         }
+    }
+    
+    private void EnableButtons()
+    {
+        
+    }
+    
+    private void DisableButtons()
+    {
+        
     }
     
     private void CellClicked(int row, int col)
@@ -447,10 +496,21 @@ public  class GraphicalClient extends Application
                     throw causeGot;
                 }
             }
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                //do nothing
+            }
         }
-        myPlayerID = gi.registerPlayer();
-        gameBoards = gi.getBoards();
-        UpdateGamePhase(GamePhase.MATCHMAKING);
+        Platform.runLater( () ->
+        {
+            myPlayerID = gi.registerPlayer();
+            gameBoards = gi.getBoards();
+            UpdateGamePhase(GamePhase.MATCHMAKING);
+        });
     }
   
     /**
