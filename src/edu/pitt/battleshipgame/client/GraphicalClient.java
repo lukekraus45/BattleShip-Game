@@ -42,9 +42,8 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.event.EventHandler;
 
-public  class GraphicalClient extends Application implements EventHandler<ActionEvent>
+public  class GraphicalClient extends Application
 {
     private Scene scene;
     private Stage primaryStage;
@@ -74,21 +73,10 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         primaryStage.setMinHeight(400);
         primaryStage.setMinWidth(500);
         primaryStage.show();
-        
         Platform.runLater( () ->
         {
             ConnectToServer();
         });
-
-    }
-    
-    @Override
-    public void handle(ActionEvent event){
-    
-        if(event.getSource() == doneButton){
-            System.out.println("done button works");
-        }
-        
     }
     
     private void initialize()
@@ -106,9 +94,7 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         this.scene = GenerateScene(masterPane);
         this.myPlayerID = -1;
     }
-    
-    
-    
+       
     private Scene GenerateScene(Parent parent)
     {
         Scene scene = new Scene(parent, 800, 450);
@@ -149,11 +135,6 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         prompt.setFont(new Font("Regular",20));
         return prompt;
     }
-    
-  public void changePhase(GamePhase p){
-   this.phase = p;
-      
-  }
         
     public void UpdatePrompt()
     {
@@ -231,7 +212,6 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         //should only be activated during placement phase, as buttons should be disabled during all other phases
         //if the ship is not placed, click should set the corresponding ship as the one being placed
         //if the ship is placed, click should remove the ship from the board.
-        AddCellListeners(ourCells);
         current_ship = type;        
     }
     
@@ -322,8 +302,6 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         }
     }
     
-  
-    
     private MenuBar GenerateMenuBar()
     {
         MenuItem surrender = new MenuItem("Surrender");
@@ -360,13 +338,41 @@ public  class GraphicalClient extends Application implements EventHandler<Action
         CONNECTING
     }
     
-    private void UpdateGamePhase(GamePhase game_phase)
+    private void UpdateGamePhase(GamePhase phase)
     {
         //TODO
         //update game based on phase
         //disable/enable buttons, listners, etc.
-        this.phase = game_phase;
+        this.phase = phase;
         UpdatePrompt();
+        UpdateCellListeners(phase);
+    }
+    
+    private void UpdateCellListeners(GamePhase phase)
+    {
+        switch (phase)
+        {
+            case CONNECTING:
+                RemoveCellListeners(this.theirCells);
+                RemoveCellListeners(this.ourCells);
+                break;
+            case MATCHMAKING:
+                RemoveCellListeners(this.theirCells);
+                RemoveCellListeners(this.ourCells);
+                break;
+            case PLACEMENT:
+                RemoveCellListeners(this.theirCells);
+                AddCellListeners(this.ourCells);
+                break;
+            case FIRING:
+                RemoveCellListeners(this.ourCells);
+                AddCellListeners(this.theirCells);
+                break;
+            case WAITING:
+                RemoveCellListeners(this.theirCells);
+                RemoveCellListeners(this.ourCells);
+                break;
+        }
     }
     
     private void placeShips(Board board,Ship.ShipType type) {
