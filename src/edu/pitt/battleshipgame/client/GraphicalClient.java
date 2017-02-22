@@ -439,7 +439,7 @@ public  class GraphicalClient extends Application
         Should wait to see what button is pressed (ship type). Whatever ship type is pressed it should set the start coordinate to the cell that is clicked into
         The end point should be the cell that is clicked next. After these two values are computed the ship should be placed on the board. (Not sure how we want to go about this
         We could make an actual ship graphic (not sure how difficult that will be) or an easier way would be to just color the cells different colors (ex. red for desroyer yellow
-        for battleship etc.) 
+        for battleship etc.) We could also use a character to represent the different ships C for carrier, D for destroyer etc.
       
       */
       
