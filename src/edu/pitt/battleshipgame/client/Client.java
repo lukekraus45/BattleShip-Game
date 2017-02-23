@@ -65,6 +65,7 @@ public class Client {
             gameBoards = gi.getBoards();
             System.out.println("Where would you like to place your move?");
             Coordinate move = new Coordinate(scan.nextLine().toLowerCase());
+            try {
             Ship ship = gameBoards.get((myPlayerID + 1) % GameTracker.MAX_PLAYERS).makeMove(move);
             if(ship == null) {
                 System.out.println("Miss");
@@ -75,6 +76,10 @@ public class Client {
             }
             // Send the updated boards.
             gi.setBoards(gameBoards);
+            } catch(IllegalArgumentException alreadyFired)
+            {
+                System.out.println("This location was already guess, please try again.");
+            }
         } while(!gi.isGameOver());
         System.out.println("The Game is Over!");
     }
