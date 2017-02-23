@@ -257,12 +257,9 @@ public  class GraphicalClient extends Application
         if (this.ships.containsKey(type))
         {
             RemoveShip(type);
-            this.initialPlacementCoordinate = null;
         }
-        else
-        {
-            this.currentlyPlacing = type;
-        }
+        this.currentlyPlacing = type;
+        this.initialPlacementCoordinate = null;
     }
     
     private void PlacementCoordinatesEntered(int row, int col)
@@ -280,6 +277,19 @@ public  class GraphicalClient extends Application
                 this.ships.put(this.currentlyPlacing, ship);
                 this.ourBoard.setCellType(GraphicalBoard.CellType.SHIP, this.initialPlacementCoordinate, finalPlacementCoordinate);
                 MarkOccupied(this.initialPlacementCoordinate, finalPlacementCoordinate, true);
+            }
+            else if (!ship.isValid())
+            {
+                String message = "Hey!!! What are you doing!? The "
+                        + ship.getName() + " is " + ship.getLength() + " cells long. Come on, you know that";
+                Alert wrongLength = new Alert(AlertType.ERROR, message, ButtonType.OK);
+                wrongLength.show();
+            }
+            else if (!PlacementValid(this.initialPlacementCoordinate, finalPlacementCoordinate))
+            {
+                String message = "Hey!!! What are you doing!? There is already a ship there. Are you blind?";
+                Alert overlap = new Alert(AlertType.ERROR, message, ButtonType.OK);
+                overlap.show();
             }
             this.currentlyPlacing = null;
             this.initialPlacementCoordinate = null;
@@ -345,9 +355,8 @@ public  class GraphicalClient extends Application
     private void RemoveShip(Ship.ShipType ship)
     {
         Ship shipToRemove = this.ships.remove(ship);
-        List<Coordinate> coordinates = shipToRemove.getCoordinates();
-        this.ourBoard.setCellType(GraphicalBoard.CellType.WATER, coordinates.get(0), coordinates.get(1));
-        MarkOccupied(coordinates.get(0), coordinates.get(1), false);
+        this.ourBoard.setCellType(GraphicalBoard.CellType.WATER, shipToRemove.getStart(), shipToRemove.getEnd());
+        MarkOccupied(shipToRemove.getStart(), shipToRemove.getEnd(), false);
     }
     
     private Button GenerateButton(String text)

@@ -46,7 +46,18 @@ public abstract class Ship implements Serializable {
                 coordinates.add(new Coordinate(i, start.getCol()));
             }
         }
+
         return coordinates;
+    }
+    
+    public Coordinate getStart()
+    {
+        return this.start;
+    }
+    
+    public Coordinate getEnd()
+    {
+        return this.end;
     }
     
     public boolean isSunk() {
