@@ -8,9 +8,9 @@ public class Destroyer extends Ship {
     public static final int MAX_ALLOWED = 1;
     public static final String NAME = "Destroyer";
 
-    public Destroyer(Coordinate start, Coordinate end, Board board) {
+    public Destroyer(Coordinate start, Coordinate end) {
         // Call the parent constructor and set the length to 5.
-        super(start, end, board);
+        super(start, end);
     }
     
     @Override

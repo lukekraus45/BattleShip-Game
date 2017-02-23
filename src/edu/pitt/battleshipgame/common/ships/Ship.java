@@ -28,10 +28,9 @@ public abstract class Ship implements Serializable {
     private Board myBoard = null;
     Coordinate start, end;
     
-    public Ship(Coordinate start, Coordinate end, Board board) {
+    public Ship(Coordinate start, Coordinate end) {
         this.start = start;
         this.end = end;
-        addBoard(board);
     }
     
     public List<Coordinate> getCoordinates() {
@@ -65,6 +64,28 @@ public abstract class Ship implements Serializable {
     
     public void registerHit() {
         hitCount++;
+    }
+    
+    public boolean isValid()
+    {
+        int x1 = this.start.getCol();
+        int x2 = this.end.getCol();
+        int y1 = this.start.getRow();
+        int y2 = this.end.getRow();
+        boolean valid;
+        if (x1 == x2)
+        {
+            valid = (Math.abs(y1 - y2) + 1) == getLength();
+        }
+        else if (y1 == y2)
+        {
+            valid = (Math.abs(x1 - x2) + 1) == getLength();
+        }
+        else
+        {
+            valid = false;
+        }
+        return valid;
     }
     
     /**

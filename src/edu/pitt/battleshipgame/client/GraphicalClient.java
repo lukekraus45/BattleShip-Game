@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.pitt.battleshipgame.client;
 
 import edu.pitt.battleshipgame.common.GameInterface;
@@ -12,6 +7,7 @@ import edu.pitt.battleshipgame.common.ships.Ship;
 import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -58,8 +54,8 @@ public  class GraphicalClient extends Application
     private GraphicalBoard theirBoard;
     private StringProperty prompt;
     private GamePhase phase = GamePhase.CONNECTING;
-    public static GameInterface gi;
-    public static int myPlayerID;
+    public static GameInterface gameInterface;
+    public static int playerID;
     public static ArrayList<Board> gameBoards;
     private Pane[][] ourCells;
     private Pane[][] theirCells;
@@ -70,6 +66,10 @@ public  class GraphicalClient extends Application
     private HashMap<Ship.ShipType, Button> shipButtons;
     private Button doneButton;
     private MenuItem surrender;
+    private HashMap<Ship.ShipType, Ship> ships;
+    private Ship.ShipType currentlyPlacing = null;
+    private Coordinate initialPlacementCoordinate = null;
+    private boolean[][] occupied;
     
     @Override
     public void start(Stage primaryStage)
@@ -85,6 +85,7 @@ public  class GraphicalClient extends Application
         Task task = new Task<Void>() {
             @Override public Void call() {
                 ConnectToServer();
+                WaitForOpponent();
                 return null;
             }
         };
@@ -95,7 +96,9 @@ public  class GraphicalClient extends Application
     
     private void initialize()
     {
+        this.occupied = new boolean[10][10];
         this.shipButtons = new HashMap<>();
+        this.ships = new HashMap<>();
         this.prompt = new SimpleStringProperty();
         this.grid = GenerateGrid();
         this.grid.add(GeneratePlacementButtonGrid(), 0, 2);
@@ -106,7 +109,7 @@ public  class GraphicalClient extends Application
         masterPane.setTop(GenerateMenuBar());
         masterPane.setCenter(this.grid);
         this.scene = GenerateScene(masterPane);
-        this.myPlayerID = -1;
+        this.playerID = -1;
         UpdateGamePhase(this.phase);
         this.primaryStage.setTitle("Battleship");
         this.primaryStage.setScene(this.scene);
@@ -208,9 +211,9 @@ public  class GraphicalClient extends Application
         return grid;
     }
     
-    private void AddDoneButtonListener(Button button)
+    private void AddDoneButtonListener()
     {
-        button.setOnAction((ActionEvent event) ->
+        this.doneButton.setOnAction((ActionEvent event) ->
         {
            //TODO
            //check that all ships are placed
@@ -218,15 +221,20 @@ public  class GraphicalClient extends Application
         });
     }
     
+    private void RemoveDoneButtonListener()
+    {
+        this.doneButton.setOnAction(null);
+    }
+    
     private void AddShipButtonListeners()
     {
-        for (HashMap.Entry entry : this.shipButtons.entrySet())
+        this.shipButtons.entrySet().forEach((entry) ->
         {
             ((Button)entry.getValue()).setOnAction((ActionEvent event) ->
             {
                 ShipButtonClicked((Ship.ShipType)entry.getKey());
             });
-        }
+        });
     }
     
     private void RemoveShipButtonListeners()
@@ -243,7 +251,103 @@ public  class GraphicalClient extends Application
         //should only be activated during placement phase, as buttons should be disabled during all other phases
         //if the ship is not placed, click should set the corresponding ship as the one being placed
         //if the ship is placed, click should remove the ship from the board.
-        this.current_ship = type;        
+        this.current_ship = type;
+        
+        
+        if (this.ships.containsKey(type))
+        {
+            RemoveShip(type);
+            this.initialPlacementCoordinate = null;
+        }
+        else
+        {
+            this.currentlyPlacing = type;
+        }
+    }
+    
+    private void PlacementCoordinatesEntered(int row, int col)
+    {
+        if (this.initialPlacementCoordinate == null)
+        {
+            this.initialPlacementCoordinate = new Coordinate(row, col);
+        }
+        else if (this.currentlyPlacing != null)
+        {
+            Coordinate finalPlacementCoordinate = new Coordinate(row, col);
+            Ship ship = ShipFactory.newShipFromType(this.currentlyPlacing, this.initialPlacementCoordinate, finalPlacementCoordinate);
+            if (ship.isValid() && PlacementValid(this.initialPlacementCoordinate, finalPlacementCoordinate))
+            {
+                this.ships.put(this.currentlyPlacing, ship);
+                this.ourBoard.setCellType(GraphicalBoard.CellType.SHIP, this.initialPlacementCoordinate, finalPlacementCoordinate);
+                MarkOccupied(this.initialPlacementCoordinate, finalPlacementCoordinate, true);
+            }
+            this.currentlyPlacing = null;
+            this.initialPlacementCoordinate = null;
+        }
+    }
+    
+    private void MarkOccupied(Coordinate c1, Coordinate c2, boolean occupied)
+    {
+        int x1 = c1.getCol();
+        int x2 = c2.getCol();
+        int y1 = c1.getRow();
+        int y2 = c2.getRow();
+        if (x1 > x2)
+        {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+        if (y1 > y2)
+        {
+            int temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        for (int x = x1; x <= x2; x++)
+        {
+            for (int y = y1; y <= y2; y++)
+            {
+                this.occupied[y][x] = occupied;
+            }
+        }
+    }
+    
+    private boolean PlacementValid(Coordinate c1, Coordinate c2)
+    {
+        boolean valid = true;
+        int x1 = c1.getCol();
+        int x2 = c2.getCol();
+        int y1 = c1.getRow();
+        int y2 = c2.getRow();
+        if (x1 > x2)
+        {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+        if (y1 > y2)
+        {
+            int temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        for (int x = x1; x <= x2; x++)
+        {
+            for (int y = y1; y <= y2; y++)
+            {
+                valid &= !this.occupied[y][x];
+            }
+        }
+        return valid;
+    }
+    
+    private void RemoveShip(Ship.ShipType ship)
+    {
+        Ship shipToRemove = this.ships.remove(ship);
+        List<Coordinate> coordinates = shipToRemove.getCoordinates();
+        this.ourBoard.setCellType(GraphicalBoard.CellType.WATER, coordinates.get(0), coordinates.get(1));
+        MarkOccupied(coordinates.get(0), coordinates.get(1), false);
     }
     
     private Button GenerateButton(String text)
@@ -285,8 +389,8 @@ public  class GraphicalClient extends Application
         {
             for (int col = 0; col < 10; col++)
             {
-                final int x = row;
-                final int y = col;
+                final int x = col;
+                final int y = row;
                 cells[row][col].setOnMouseClicked((MouseEvent event) ->
                 {
                     CellClicked(x, y);
@@ -308,11 +412,21 @@ public  class GraphicalClient extends Application
     
     private void EnableButtons(boolean enable)
     {
-        for (HashMap.Entry entry : this.shipButtons.entrySet())
+        this.shipButtons.entrySet().forEach((entry) ->
         {
             ((Button)entry.getValue()).setDisable(!enable);
-        }
+        });
         this.doneButton.setDisable(!enable);
+        if (enable)
+        {
+            AddShipButtonListeners();
+            AddDoneButtonListener();
+        }
+        else
+        {
+            RemoveShipButtonListeners();
+            RemoveDoneButtonListener();
+        }
     }
     
     private void CellClicked(int row, int col)
@@ -325,20 +439,26 @@ public  class GraphicalClient extends Application
         //it is supposed to place ships than it will be our cells and if it is to guess a coordinate it would be theircells
         //In otherwords we don't need to worry about gamestate here, but rather in some other method 
         
-        if(start_or_end){
-        //if true then the coordinate that is being placed is the end coordintate. This means that the start coordinate would have already been clicked
-        start_or_end = false;
-        global_end = new Coordinate(col,row);
-        }else{
-        start_or_end = true;
-        global_start = new Coordinate(col,row);
-        }
+//        if(start_or_end){
+//        //if true then the coordinate that is being placed is the end coordintate. This means that the start coordinate would have already been clicked
+//        start_or_end = false;
+//        global_end = new Coordinate(col,row);
+//        }else{
+//        start_or_end = true;
+//        global_start = new Coordinate(col,row);
+//        }
+//        
+//        if(this.phase == GamePhase.PLACEMENT){
+//        
+//            while(global_start != null && global_end != null){
+//            placeShips(gameBoards.get(playerID) , current_ship);
+//            }
+//        }
         
-        if(this.phase == GamePhase.PLACEMENT){
         
-            while(global_start != null && global_end != null){
-            placeShips(gameBoards.get(myPlayerID) , current_ship);
-            }
+        if (this.phase == GamePhase.PLACEMENT)
+        {
+            PlacementCoordinatesEntered(row, col);
         }
     }
     
@@ -366,17 +486,16 @@ public  class GraphicalClient extends Application
     
     private void quit(Event e)
     {
-        //TODO
         final String confirmText = "Are you sure that you want to quit?";
         Alert confirm = new Alert(AlertType.CONFIRMATION, confirmText, ButtonType.CANCEL, ButtonType.OK);
         confirm.showAndWait();
         if (confirm.getResult() == ButtonType.CANCEL)
         {
-            
+            e.consume();
         }
         else if (confirm.getResult() == ButtonType.OK)
         {
-            
+            Platform.exit();
         }
     }
     
@@ -475,7 +594,7 @@ public  class GraphicalClient extends Application
                 }
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
-                ShipFactory.newShipFromType(type, start, end, board);
+                //ShipFactory.newShipFromType(type, start, end, board);
                 
           
       }
@@ -487,7 +606,7 @@ public  class GraphicalClient extends Application
         {
             try
             {
-                gi = new ClientWrapper();
+                this.gameInterface = new ClientWrapper();
                 break;
             }
             catch (Throwable causeGot)
@@ -517,9 +636,18 @@ public  class GraphicalClient extends Application
         }
         Platform.runLater( () ->
         {
-            myPlayerID = gi.registerPlayer();
-            gameBoards = gi.getBoards();
+            this.playerID = this.gameInterface.registerPlayer();
+            this.gameBoards = this.gameInterface.getBoards();
             UpdateGamePhase(GamePhase.MATCHMAKING);
+        });
+    }
+    
+    private void WaitForOpponent()
+    {
+        this.gameInterface.wait(this.playerID);
+        Platform.runLater( () ->
+        {
+            UpdateGamePhase(GamePhase.PLACEMENT);
         });
     }
   
@@ -584,7 +712,7 @@ class GraphicalBoard
                 square.setBorder(new Border(new BorderStroke(Color.BLACK,
                         BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
                 this.cells[row-1][col-1] = square;
-                board.add(square, row, col);
+                board.add(square, col, row);
             }
         }
     }
@@ -644,6 +772,33 @@ class GraphicalBoard
             case SHIP:
                 SetCellColor(cell, this.grey);
                 break;
+        }
+    }
+    
+    public void setCellType(CellType type, Coordinate c1, Coordinate c2)
+    {
+        int x1 = c1.getCol();
+        int x2 = c2.getCol();
+        int y1 = c1.getRow();
+        int y2 = c2.getRow();
+        if (x1 > x2)
+        {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+        if (y1 > y2)
+        {
+            int temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        for (int x = x1; x <= x2; x++)
+        {
+            for (int y = y1; y <= y2; y++)
+            {
+                setCellType(type, x, y);
+            }
         }
     }
     

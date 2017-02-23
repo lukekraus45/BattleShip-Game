@@ -1,25 +1,20 @@
 package edu.pitt.battleshipgame.common.ships;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import edu.pitt.battleshipgame.common.ships.*;
 import edu.pitt.battleshipgame.common.board.*;
 
 public abstract class ShipFactory {
-    public static Ship newShipFromType(Ship.ShipType type, Coordinate start, Coordinate end, Board board) {
+    public static Ship newShipFromType(Ship.ShipType type, Coordinate start, Coordinate end) {
         switch (type) {
             case BATTLESHIP:
-                return new Battleship(start, end, board);
+                return new Battleship(start, end);
             case CARRIER:
-                return new Carrier(start, end, board);
+                return new Carrier(start, end);
             case CRUISER:
-                return new Cruiser(start, end, board);
+                return new Cruiser(start, end);
             case SUBMARINE:
-                return new Submarine(start, end, board);
+                return new Submarine(start, end);
             case DESTROYER:
-                return new Destroyer(start, end, board);
+                return new Destroyer(start, end);
             default:
                 throw new IllegalArgumentException(type + " does not identify a valid ShipType.");
         }
