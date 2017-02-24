@@ -46,7 +46,7 @@ public class Board implements Serializable {
             throw new IllegalArgumentException("This board already has the maximum amount of: " + ship.getName());
         }
         for (Coordinate coord : ship.getCoordinates()){
-            theShips[coord.getRow()][coord.getCol()] = ship;
+            theShips[coord.getCol()][coord.getRow()] = ship;
         }
         shipList.add(ship);
     }
