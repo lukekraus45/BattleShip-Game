@@ -71,7 +71,7 @@ public class GameTracker {
     public boolean isGameOver() {
         System.out.println("Checking if the game is over...");
         for(Board board : gameBoards) {
-            if(board.areAllShipsSunk()) {
+            if(board.areAllShipsSunk() && board.getShipList().size() == 5) {
                 return true;
             }
         }

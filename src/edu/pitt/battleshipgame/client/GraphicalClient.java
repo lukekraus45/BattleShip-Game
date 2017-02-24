@@ -54,9 +54,9 @@ public  class GraphicalClient extends Application
     private GraphicalBoard theirBoard;
     private StringProperty prompt;
     private GamePhase phase = GamePhase.CONNECTING;
-    public static GameInterface gameInterface;
-    public static int playerID;
-    public static ArrayList<Board> gameBoards;
+    private GameInterface gameInterface;
+    private int playerID;
+    private ArrayList<Board> gameBoards;
     private Pane[][] ourCells;
     private Pane[][] theirCells;
     private HashMap<Ship.ShipType, Button> shipButtons;
@@ -254,6 +254,7 @@ public  class GraphicalClient extends Application
     
     private void UpdateBoards()
     {
+        System.out.println("updateboards called");
         Coordinate theirMove = this.gameBoards.get((this.playerID + 1) % 2).getLastMove();
         if (theirMove != null)
         {

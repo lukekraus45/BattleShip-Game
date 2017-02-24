@@ -43,7 +43,7 @@ public class Client {
                 Coordinate end = new Coordinate(scan.nextLine().toLowerCase());
                 // We don't need to track a reference to the ship since it will be
                 // on the board.
-                ShipFactory.newShipFromType(type, start, end, board);
+                //ShipFactory.newShipFromType(type, start, end, board);
             }
         }
     }
