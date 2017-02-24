@@ -7,7 +7,6 @@ import edu.pitt.battleshipgame.common.ships.Ship;
 import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -212,6 +211,7 @@ public  class GraphicalClient extends Application
         this.doneButton.setOnAction((ActionEvent event) ->
         {
             UpdateGamePhase(GamePhase.WAITING);
+            this.gameBoards = this.gameInterface.getBoards();
             this.ships.values().forEach((ship) ->
             {
                 this.gameBoards.get(this.playerID).addShip(ship);
@@ -243,6 +243,7 @@ public  class GraphicalClient extends Application
     
     private void WaitForOpponent()
     {
+        System.out.println(this.playerID);
         this.gameInterface.wait(this.playerID);
         this.gameBoards = this.gameInterface.getBoards();
         Platform.runLater( () ->
@@ -254,8 +255,7 @@ public  class GraphicalClient extends Application
     
     private void UpdateBoards()
     {
-        System.out.println("updateboards called");
-        Coordinate theirMove = this.gameBoards.get((this.playerID + 1) % 2).getLastMove();
+        Coordinate theirMove = this.gameBoards.get(this.playerID).getLastMove();
         if (theirMove != null)
         {
             int y = theirMove.getRow();
@@ -430,7 +430,7 @@ public  class GraphicalClient extends Application
         this.ourBoard = new GraphicalBoard("Your Board");
         this.theirBoard = new GraphicalBoard("Opponent's Board");
         this.ourCells = this.ourBoard.getCells();
-        this.theirCells = this.ourBoard.getCells();
+        this.theirCells = this.theirBoard.getCells();
         grid.add(this.ourBoard.getBoard(), 0, 0);
         grid.add(this.theirBoard.getBoard(), 1, 0);
         
@@ -447,7 +447,7 @@ public  class GraphicalClient extends Application
                 final int y = row;
                 cells[row][col].setOnMouseClicked((MouseEvent event) ->
                 {
-                    CellClicked(x, y);
+                    CellClicked(y, x);
                 });
             }
         }
@@ -497,10 +497,11 @@ public  class GraphicalClient extends Application
     
     private void Fire(int row, int col)
     {
-        Board ourBoard = this.gameBoards.get(this.playerID);
-        if (!ourBoard.getMoves()[col][row])
+        Board theirGameBoard = this.gameBoards.get((this.playerID + 1) % 2);
+        if (!theirGameBoard.getMoves()[col][row]) //Board class uses column then row
         {
-            Ship shipHit = ourBoard.makeMove(new Coordinate(row, col));
+            System.out.println(theirGameBoard.getShipList().size());
+            Ship shipHit = theirGameBoard.makeMove(new Coordinate(row, col));
             this.gameInterface.setBoards(this.gameBoards);
             if (shipHit != null)
             {
@@ -511,6 +512,7 @@ public  class GraphicalClient extends Application
                 this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
             }
             UpdateGamePhase(GamePhase.WAITING);
+            Wait();
         }
         else
         {
@@ -652,7 +654,6 @@ public  class GraphicalClient extends Application
     private void WaitForMatch()
     {
         this.gameInterface.wait(this.playerID);
-        this.gameBoards = this.gameInterface.getBoards();
 
         Platform.runLater( () ->
         {
@@ -806,7 +807,7 @@ class GraphicalBoard
         {
             for (int y = y1; y <= y2; y++)
             {
-                setCellType(type, x, y);
+                setCellType(type, y, x);
             }
         }
     }
