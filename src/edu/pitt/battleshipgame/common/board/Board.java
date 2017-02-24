@@ -18,6 +18,7 @@ public class Board implements Serializable {
     // Keep a list of all ships on this board for quick searching.
     LinkedList<Ship> shipList;
     private String name;
+    private Coordinate lastMove;
 
     public Board (String _name) {
         theShips = new Ship[BOARD_DIM][BOARD_DIM];
@@ -26,8 +27,18 @@ public class Board implements Serializable {
         name = _name;
     }
     
+    public Coordinate getLastMove()
+    {
+        return this.lastMove;
+    }
+    
     public String getName() {
         return name;
+    }
+    
+    public boolean[][] getMoves()
+    {
+        return this.moves.clone();
     }
     
     public void addShip(Ship ship) {
@@ -41,6 +52,7 @@ public class Board implements Serializable {
     }
     
     public Ship makeMove(Coordinate move) {
+        this.lastMove = move;
         moves[move.getCol()][move.getRow()] = true;
         Ship ship = theShips[move.getCol()][move.getRow()];
         if(ship != null) {

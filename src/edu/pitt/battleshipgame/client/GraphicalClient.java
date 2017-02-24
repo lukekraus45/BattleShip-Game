@@ -59,10 +59,6 @@ public  class GraphicalClient extends Application
     public static ArrayList<Board> gameBoards;
     private Pane[][] ourCells;
     private Pane[][] theirCells;
-    static boolean connection_made = false;
-    static Ship.ShipType current_ship;
-    static Coordinate  global_start = null, global_end = null;
-    static boolean start_or_end = false; //if false then the next value is start and if true then the next cell is the end. Used for placing ships
     private HashMap<Ship.ShipType, Button> shipButtons;
     private Button doneButton;
     private MenuItem surrender;
@@ -85,7 +81,7 @@ public  class GraphicalClient extends Application
         Task task = new Task<Void>() {
             @Override public Void call() {
                 ConnectToServer();
-                WaitForOpponent();
+                WaitForMatch();
                 return null;
             }
         };
@@ -109,7 +105,6 @@ public  class GraphicalClient extends Application
         masterPane.setTop(GenerateMenuBar());
         masterPane.setCenter(this.grid);
         this.scene = GenerateScene(masterPane);
-        this.playerID = -1;
         UpdateGamePhase(this.phase);
         this.primaryStage.setTitle("Battleship");
         this.primaryStage.setScene(this.scene);
@@ -155,7 +150,7 @@ public  class GraphicalClient extends Application
         prompt.setMaxWidth(Double.MAX_VALUE);
         prompt.setAlignment(Pos.CENTER);
         prompt.setContentDisplay(ContentDisplay.CENTER);
-        prompt.setFont(new Font("Regular",20));
+        prompt.setFont(new Font("Regular",15));
         return prompt;
     }
         
@@ -170,13 +165,14 @@ public  class GraphicalClient extends Application
                 this.prompt.set("Please wait while a match is made");
                 break;
             case PLACEMENT:
-                this.prompt.set("Please place your ships");
+                this.prompt.set("Please place your ships by clicking a " +
+                        "ship button then the coordinates of the ends of the ship");
                 break;
             case FIRING:
                 this.prompt.set("Please choose a cell to fire on");
                 break;
             case WAITING:
-                this.prompt.set("Please wait while your opponent chooses a cell to fire on");
+                this.prompt.set("Please wait for your opponent");
                 break;
         }
     }
@@ -215,10 +211,63 @@ public  class GraphicalClient extends Application
     {
         this.doneButton.setOnAction((ActionEvent event) ->
         {
-           //TODO
-           //check that all ships are placed
-           //then, move the the firing phase
+            UpdateGamePhase(GamePhase.WAITING);
+            this.ships.values().forEach((ship) ->
+            {
+                this.gameBoards.get(this.playerID).addShip(ship);
+            });
+            gameInterface.setBoards(this.gameBoards);
+            Wait();
         });
+    }
+    
+    private void Wait()
+    {
+        if (!this.gameInterface.isGameOver())
+        {
+            Task task = new Task<Void>() {
+                @Override public Void call() {
+                    WaitForOpponent();
+                    return null;
+                }
+            };
+            Thread thread = new Thread(task);
+            thread.setDaemon(true);
+            thread.start();
+        }
+        else
+        {
+            //TODO game is over
+        }
+    }
+    
+    private void WaitForOpponent()
+    {
+        this.gameInterface.wait(this.playerID);
+        this.gameBoards = this.gameInterface.getBoards();
+        Platform.runLater( () ->
+        {
+            UpdateBoards();
+            UpdateGamePhase(GamePhase.FIRING);
+        });
+    }
+    
+    private void UpdateBoards()
+    {
+        Coordinate theirMove = this.gameBoards.get((this.playerID + 1) % 2).getLastMove();
+        if (theirMove != null)
+        {
+            int y = theirMove.getRow();
+            int x = theirMove.getCol();
+            if (this.occupied[y][x])
+            {
+                this.ourBoard.setCellType(GraphicalBoard.CellType.HIT, y, x);
+            }
+            else
+            {
+                this.ourBoard.setCellType(GraphicalBoard.CellType.MISS, y, x);
+            }
+        }
     }
     
     private void RemoveDoneButtonListener()
@@ -247,13 +296,6 @@ public  class GraphicalClient extends Application
     
     private void ShipButtonClicked(Ship.ShipType type)
     {
-        //TODO
-        //should only be activated during placement phase, as buttons should be disabled during all other phases
-        //if the ship is not placed, click should set the corresponding ship as the one being placed
-        //if the ship is placed, click should remove the ship from the board.
-        this.current_ship = type;
-        
-        
         if (this.ships.containsKey(type))
         {
             RemoveShip(type);
@@ -277,6 +319,8 @@ public  class GraphicalClient extends Application
                 this.ships.put(this.currentlyPlacing, ship);
                 this.ourBoard.setCellType(GraphicalBoard.CellType.SHIP, this.initialPlacementCoordinate, finalPlacementCoordinate);
                 MarkOccupied(this.initialPlacementCoordinate, finalPlacementCoordinate, true);
+                this.doneButton.setDisable(!(this.ships.size() == 5));
+                this.currentlyPlacing = null;
             }
             else if (!ship.isValid())
             {
@@ -291,7 +335,6 @@ public  class GraphicalClient extends Application
                 Alert overlap = new Alert(AlertType.ERROR, message, ButtonType.OK);
                 overlap.show();
             }
-            this.currentlyPlacing = null;
             this.initialPlacementCoordinate = null;
         }
     }
@@ -357,6 +400,7 @@ public  class GraphicalClient extends Application
         Ship shipToRemove = this.ships.remove(ship);
         this.ourBoard.setCellType(GraphicalBoard.CellType.WATER, shipToRemove.getStart(), shipToRemove.getEnd());
         MarkOccupied(shipToRemove.getStart(), shipToRemove.getEnd(), false);
+        this.doneButton.setDisable(!(this.ships.size() == 5));
     }
     
     private Button GenerateButton(String text)
@@ -425,7 +469,7 @@ public  class GraphicalClient extends Application
         {
             ((Button)entry.getValue()).setDisable(!enable);
         });
-        this.doneButton.setDisable(!enable);
+        this.doneButton.setDisable(!(enable && this.ships.size() == 5));
         if (enable)
         {
             AddShipButtonListeners();
@@ -440,34 +484,38 @@ public  class GraphicalClient extends Application
     
     private void CellClicked(int row, int col)
     {
-        //TODO
-        //Action should depend upon game state
-        //if the cell is clicked during the placement phase, the click originates from ourBoard
-        //if the sell is clicked during the firing phase, the cell originates from theirBoard
-       //The above logic should be worked out by the caller function. For example if the method that is calling
-        //it is supposed to place ships than it will be our cells and if it is to guess a coordinate it would be theircells
-        //In otherwords we don't need to worry about gamestate here, but rather in some other method 
-        
-//        if(start_or_end){
-//        //if true then the coordinate that is being placed is the end coordintate. This means that the start coordinate would have already been clicked
-//        start_or_end = false;
-//        global_end = new Coordinate(col,row);
-//        }else{
-//        start_or_end = true;
-//        global_start = new Coordinate(col,row);
-//        }
-//        
-//        if(this.phase == GamePhase.PLACEMENT){
-//        
-//            while(global_start != null && global_end != null){
-//            placeShips(gameBoards.get(playerID) , current_ship);
-//            }
-//        }
-        
-        
         if (this.phase == GamePhase.PLACEMENT)
         {
             PlacementCoordinatesEntered(row, col);
+        }
+        else if (this.phase == GamePhase.FIRING)
+        {
+            Fire(row, col);
+        }
+    }
+    
+    private void Fire(int row, int col)
+    {
+        Board ourBoard = this.gameBoards.get(this.playerID);
+        if (!ourBoard.getMoves()[col][row])
+        {
+            Ship shipHit = ourBoard.makeMove(new Coordinate(row, col));
+            this.gameInterface.setBoards(this.gameBoards);
+            if (shipHit != null)
+            {
+                this.theirBoard.setCellType(GraphicalBoard.CellType.HIT, row, col);
+            }
+            else
+            {
+                this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
+            }
+            UpdateGamePhase(GamePhase.WAITING);
+        }
+        else
+        {
+            String message = "Hey!!! What are you doing!? You already shot this cell!";
+            Alert alreadyShot = new Alert(AlertType.ERROR, message, ButtonType.OK);
+            alreadyShot.show();
         }
     }
     
@@ -558,56 +606,6 @@ public  class GraphicalClient extends Application
                 break;
         }
     }
-    
-    private void placeShips(Board board,Ship.ShipType type) {
-        
-        /*
-      
-      
-        Should wait to see what button is pressed (ship type). Whatever ship type is pressed it should set the start coordinate to the cell that is clicked into
-        The end point should be the cell that is clicked next. After these two values are computed the ship should be placed on the board. (Not sure how we want to go about this
-        We could make an actual ship graphic (not sure how difficult that will be) or an easier way would be to just color the cells different colors (ex. red for desroyer yellow
-        for battleship etc.) We could also use a character to represent the different ships C for carrier, D for destroyer etc.
-      
-      */
-      
-          
-            if(type != Ship.ShipType.NONE) {
-                
-                
-               
-                
-                Coordinate start = global_start;
-                System.out.println("Start " + start.toString());
-               
-                Coordinate end = global_end;
-                System.out.println("End " + end.toString());
-                global_start = null;
-                global_end = null;
-                
-                int length;
-                if(start.getRow() == end.getRow()){
-                //if the start and end row are the same then they will be horizontal
-                length = Math.abs(end.getCol() - start.getCol());
-                for(int i = 0; i <= length; i++){
-                ourBoard.setCellType(GraphicalBoard.CellType.SHIP, start.getRow()+i, start.getCol());
-                }
-                
-                }
-                else if(start.getCol() == end.getCol()){
-                //if the start and end col are the same they will be vertical
-                length = Math.abs(end.getRow() - start.getRow());
-                for(int i = 0; i <= length; i++){
-                ourBoard.setCellType(GraphicalBoard.CellType.SHIP, start.getRow(), start.getCol()+i);
-                }
-                }
-                // We don't need to track a reference to the ship since it will be
-                // on the board.
-                //ShipFactory.newShipFromType(type, start, end, board);
-                
-          
-      }
-    }
   
     private void ConnectToServer()
     {
@@ -646,14 +644,15 @@ public  class GraphicalClient extends Application
         Platform.runLater( () ->
         {
             this.playerID = this.gameInterface.registerPlayer();
-            this.gameBoards = this.gameInterface.getBoards();
             UpdateGamePhase(GamePhase.MATCHMAKING);
         });
     }
     
-    private void WaitForOpponent()
+    private void WaitForMatch()
     {
         this.gameInterface.wait(this.playerID);
+        this.gameBoards = this.gameInterface.getBoards();
+
         Platform.runLater( () ->
         {
             UpdateGamePhase(GamePhase.PLACEMENT);
