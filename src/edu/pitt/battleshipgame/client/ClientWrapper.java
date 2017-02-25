@@ -61,6 +61,7 @@ public class ClientWrapper implements GameInterface {
     public boolean bothUsersConnected(){
         return serverInterface.bothUsersConnected();
     }
+    
     public void player_leave(){
         serverInterface.player_leave();
     }

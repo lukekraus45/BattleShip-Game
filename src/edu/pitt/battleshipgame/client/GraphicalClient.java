@@ -81,6 +81,7 @@ public  class GraphicalClient extends Application
             @Override public Void call() {
                 ConnectToServer();
                 WaitForMatch();
+                CheckForSurrender();
                 return null;
             }
         };
@@ -485,10 +486,6 @@ public  class GraphicalClient extends Application
     
     private void CellClicked(int row, int col)
     {
-        if(!gameInterface.bothUsersConnected()){
-                //both users are not connected 
-                surrender_event();
-            }
         if (this.phase == GamePhase.PLACEMENT)
         {
             PlacementCoordinatesEntered(row, col);
@@ -560,15 +557,13 @@ public  class GraphicalClient extends Application
             Platform.exit();//exit 
         }
     }
-    private void surrender_event(){
+    
+    private void surrender_event()
+    {
         final String confirmText = "The other user has surrendered. You win";
-        Alert confirm = new Alert(AlertType.CONFIRMATION, confirmText, ButtonType.CANCEL, ButtonType.OK);
+        Alert confirm = new Alert(AlertType.INFORMATION, confirmText, ButtonType.OK);
         confirm.showAndWait();
-        if (confirm.getResult() == ButtonType.CANCEL)
-        {
-            Platform.exit();
-        }
-        else if (confirm.getResult() == ButtonType.OK)
+        if (confirm.getResult() == ButtonType.OK)
         {
             //alert the other user that the opponent has surrendered
             gameInterface.player_leave();
@@ -691,6 +686,43 @@ public  class GraphicalClient extends Application
         {
             UpdateGamePhase(GamePhase.PLACEMENT);
         });
+    }
+    
+    private void CheckForSurrender()
+    {
+        while (true)
+        {
+            if (this.gameInterface.bothUsersConnected())
+            {
+                while (true)
+                {
+                    if (!this.gameInterface.bothUsersConnected())
+                    {
+                        Platform.runLater( () ->
+                        {
+                            surrender_event();
+                        });
+                        return;
+                    }
+                    try
+                    {
+                        Thread.sleep(500);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        //do nothing
+                    }
+                }
+            }
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                //do nothing
+            }
+        }
     }
   
     public static void main(String[] args)

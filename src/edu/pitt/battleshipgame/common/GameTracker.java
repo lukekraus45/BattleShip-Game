@@ -27,10 +27,12 @@ public class GameTracker {
         }
         return registeredPlayers - 1;
     }
+    
     public void player_leave(){
         
-            registeredPlayers--;
+        registeredPlayers--;
     }
+    
     public void wait(int playerID) {
         switch (state) {
             case INIT:
@@ -71,15 +73,11 @@ public class GameTracker {
         playerTurn = (playerTurn + 1) % registeredPlayers;
     }
     
-    
-    public boolean bothUsersConnected(){
-        if(registeredPlayers >= 2){
-        return true; 
-        }else{
-        return false;
-        }
-            
+    public boolean bothUsersConnected()
+    {
+        return (this.registeredPlayers == 2);
     }
+    
     public boolean isGameOver() {
         System.out.println("Checking if the game is over...");
         for(Board board : gameBoards) {
