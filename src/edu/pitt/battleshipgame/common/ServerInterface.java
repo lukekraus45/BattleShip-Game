@@ -17,4 +17,6 @@ public interface ServerInterface {
     @WebMethod byte [] getBoards();
     @WebMethod void setBoards(byte [] boards);
     @WebMethod boolean isGameOver();
+    @WebMethod boolean bothUsersConnected();
+    @WebMethod void player_leave();
 }
