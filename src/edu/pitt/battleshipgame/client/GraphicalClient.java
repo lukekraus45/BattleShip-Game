@@ -491,6 +491,9 @@ public  class GraphicalClient extends Application
         }
         else if (this.phase == GamePhase.FIRING)
         {
+            if(!gameInterface.bothUsersConnected()){
+                //both users are not connected 
+            }
             Fire(row, col);
         }
     }
@@ -541,7 +544,19 @@ public  class GraphicalClient extends Application
     
     private void surrender(ActionEvent e)
     {
-        //TODO
+        final String confirmText = "Are you sure that you want to surrender?";
+        Alert confirm = new Alert(AlertType.CONFIRMATION, confirmText, ButtonType.CANCEL, ButtonType.OK);
+        confirm.showAndWait();
+        if (confirm.getResult() == ButtonType.CANCEL)
+        {
+            e.consume();
+        }
+        else if (confirm.getResult() == ButtonType.OK)
+        {
+            //alert the other user that the opponent has surrendered
+            gameInterface.player_leave();
+            Platform.exit();//exit 
+        }
     }
     
     private void quit(Event e)

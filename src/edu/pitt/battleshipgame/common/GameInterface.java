@@ -9,4 +9,6 @@ public interface GameInterface {
     ArrayList<Board> getBoards();
     void setBoards(ArrayList<Board> boards);
     boolean isGameOver();
+    boolean bothUsersConnected();
+    void player_leave();
 }

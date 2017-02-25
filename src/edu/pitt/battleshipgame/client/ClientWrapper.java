@@ -57,4 +57,11 @@ public class ClientWrapper implements GameInterface {
     public boolean isGameOver() {
         return serverInterface.isGameOver();
     }
+    
+    public boolean bothUsersConnected(){
+        return serverInterface.bothUsersConnected();
+    }
+    public void player_leave(){
+        serverInterface.player_leave();
+    }
 }

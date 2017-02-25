@@ -78,4 +78,11 @@ public class ServerWrapper implements ServerInterface {
     public boolean isGameOver(){
         return tracker.isGameOver();
     }
+    public void player_leave(){
+        tracker.player_leave();
+    }
+      public boolean bothUsersConnected(){
+        
+            return tracker.isGameOver();
+    }
 }
