@@ -65,4 +65,14 @@ public class ClientWrapper implements GameInterface {
     public void player_leave(){
         serverInterface.player_leave();
     }
+    
+    public void beatHeart(int id)
+    {
+        serverInterface.beatHeart(id);
+    }
+    
+    public boolean hasBeatingHeart(int id)
+    {
+        return serverInterface.hasBeatingHeart(id);
+    }
 }

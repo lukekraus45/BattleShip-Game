@@ -11,4 +11,6 @@ public interface GameInterface {
     boolean isGameOver();
     boolean bothUsersConnected();
     void player_leave();
+    void beatHeart(int playerID);
+    boolean hasBeatingHeart(int id);
 }

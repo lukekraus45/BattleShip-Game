@@ -81,7 +81,7 @@ public  class GraphicalClient extends Application
             @Override public Void call() {
                 ConnectToServer();
                 WaitForMatch();
-                CheckForSurrender();
+                CheckOpponentConnection();
                 return null;
             }
         };
@@ -217,7 +217,8 @@ public  class GraphicalClient extends Application
             {
                 this.gameBoards.get(this.playerID).addShip(ship);
             });
-            gameInterface.setBoards(this.gameBoards);
+            this.gameInterface.setBoards(this.gameBoards);
+            this.gameInterface.beatHeart(this.playerID);
             Wait();
         });
     }
@@ -504,6 +505,7 @@ public  class GraphicalClient extends Application
             System.out.println(theirGameBoard.getShipList().size());
             Ship shipHit = theirGameBoard.makeMove(new Coordinate(row, col));
             this.gameInterface.setBoards(this.gameBoards);
+            this.gameInterface.beatHeart(this.playerID);
             if (shipHit != null)
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.HIT, row, col);
@@ -557,17 +559,23 @@ public  class GraphicalClient extends Application
         }
     }
     
+    private void OpponentConnectionLost()
+    {
+        final String message = "The other player has taken too long to respond to the server, you win.";
+        Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
+        alert.showAndWait();
+        this.gameInterface.player_leave();
+        Platform.exit();
+    }
+    
     private void surrender_event()
     {
-        final String confirmText = "The other user has surrendered. You win.";
-        Alert confirm = new Alert(AlertType.INFORMATION, confirmText, ButtonType.OK);
+        final String surrenderText = "The other user has surrendered. You win.";
+        Alert confirm = new Alert(AlertType.INFORMATION, surrenderText, ButtonType.OK);
         confirm.showAndWait();
-        if (confirm.getResult() == ButtonType.OK)
-        {
-            //alert the other user that the opponent has surrendered
-            gameInterface.player_leave();
-            Platform.exit();//exit 
-        }
+        //alert the other user that the opponent has surrendered
+        gameInterface.player_leave();
+        Platform.exit();//exit 
     }
     
     private void quit(Event e)
@@ -680,6 +688,7 @@ public  class GraphicalClient extends Application
     private void WaitForMatch()
     {
         this.gameInterface.wait(this.playerID);
+        this.gameInterface.beatHeart(this.playerID);
 
         Platform.runLater( () ->
         {
@@ -687,7 +696,7 @@ public  class GraphicalClient extends Application
         });
     }
     
-    private void CheckForSurrender()
+    private void CheckOpponentConnection()
     {
         while (true)
         {
@@ -700,6 +709,14 @@ public  class GraphicalClient extends Application
                         Platform.runLater( () ->
                         {
                             surrender_event();
+                        });
+                        return;
+                    }
+                    if (!this.gameInterface.hasBeatingHeart((this.playerID + 1) % 2))
+                    {
+                        Platform.runLater( () ->
+                        {
+                            OpponentConnectionLost();
                         });
                         return;
                     }

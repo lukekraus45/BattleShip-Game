@@ -86,4 +86,14 @@ public class ServerWrapper implements ServerInterface {
     public boolean bothUsersConnected(){
         return tracker.bothUsersConnected();
     }
+    
+    public void beatHeart(int id)
+    {
+        tracker.beatHeart(id);
+    }
+    
+    public boolean hasBeatingHeart(int id)
+    {
+        return tracker.hasBeatingHeart(id);
+    }
 }
