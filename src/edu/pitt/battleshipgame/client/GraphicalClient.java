@@ -244,7 +244,6 @@ public  class GraphicalClient extends Application
     
     private void WaitForOpponent()
     {
-        System.out.println(this.playerID);
         this.gameInterface.wait(this.playerID);
         this.gameBoards = this.gameInterface.getBoards();
         Platform.runLater( () ->
@@ -560,7 +559,7 @@ public  class GraphicalClient extends Application
     
     private void surrender_event()
     {
-        final String confirmText = "The other user has surrendered. You win";
+        final String confirmText = "The other user has surrendered. You win.";
         Alert confirm = new Alert(AlertType.INFORMATION, confirmText, ButtonType.OK);
         confirm.showAndWait();
         if (confirm.getResult() == ButtonType.OK)
