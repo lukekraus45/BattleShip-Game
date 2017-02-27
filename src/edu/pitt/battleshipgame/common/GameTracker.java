@@ -54,7 +54,7 @@ public class GameTracker {
             }
             case PLAYING:
             {
-                while(playerTurn != playerID) {
+                while(playerTurn != playerID || beatCount[0] + beatCount[1] < 4) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -81,7 +81,7 @@ public class GameTracker {
     public void beatHeart(int playerID)
     {
         this.lastHeartBeat[playerID] = System.nanoTime();
-        this.beatCount[playerID]++;
+        ++this.beatCount[playerID];
     }
     
     public List<Board> getBoards() {
