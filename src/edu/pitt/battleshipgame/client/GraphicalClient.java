@@ -251,14 +251,11 @@ public  class GraphicalClient extends Application
     {
         this.gameInterface.wait(this.playerID);
         this.gameBoards = this.gameInterface.getBoards();
-        Platform.runLater( () ->
-        {
-            CheckIfShipsSunk();
-        });
         if (this.gameInterface.isGameOver())
         {
             Platform.runLater( () ->
             {
+                CheckIfShipsSunk();
                 GameOver();
             });
         }
@@ -266,6 +263,7 @@ public  class GraphicalClient extends Application
         {
             Platform.runLater( () ->
             {
+                CheckIfShipsSunk();
                 UpdateBoards();
                 UpdateGamePhase(GamePhase.FIRING);
             });
