@@ -250,11 +250,21 @@ public  class GraphicalClient extends Application
     {
         this.gameInterface.wait(this.playerID);
         this.gameBoards = this.gameInterface.getBoards();
-        Platform.runLater( () ->
+        if (this.gameInterface.isGameOver())
         {
-            UpdateBoards();
-            UpdateGamePhase(GamePhase.FIRING);
-        });
+            Platform.runLater( () ->
+            {
+                GameOver();
+            });
+        }
+        else
+        {
+            Platform.runLater( () ->
+            {
+                UpdateBoards();
+                UpdateGamePhase(GamePhase.FIRING);
+            });
+        }
     }
     
     private void UpdateBoards()
@@ -503,30 +513,29 @@ public  class GraphicalClient extends Application
     
     private void Fire(int row, int col)
     {
-        System.out.println("PID " + this.playerID);
-        System.out.println("Pleyer ID " + (((this.playerID + 1)%2)));
         Board theirGameBoard = this.gameBoards.get((this.playerID + 1) % 2);
-        System.out.println(theirGameBoard.toString());
         if (!theirGameBoard.getMoves()[col][row]) //Board class uses column then row
         {
-            //System.out.println(theirGameBoard.getShipList().size());
-            //System.out.println(theirGameBoard.toString());
-            
             Ship shipHit = theirGameBoard.makeMove(new Coordinate(row, col));
             this.gameInterface.setBoards(this.gameBoards);
             this.gameInterface.beatHeart(this.playerID);
             if (shipHit != null)
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.HIT, row, col);
-                System.out.println(theirGameBoard.toString());
             }
             else
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
-                System.out.println(theirGameBoard.toString());
             }
-            UpdateGamePhase(GamePhase.WAITING);
-            Wait();
+            if (this.gameInterface.isGameOver())
+            {
+                GameOver();
+            }
+            else
+            {
+                UpdateGamePhase(GamePhase.WAITING);
+                Wait();
+            }
         }
         else
         {
@@ -613,6 +622,22 @@ public  class GraphicalClient extends Application
         }
     }
     
+    private void GameOver()
+    {
+        String message = "";
+        if (this.gameBoards.get(this.playerID).areAllShipsSunk())
+        {
+            message = "Your opponent has sunk your fleet. You lose.";
+        }
+        else if (this.gameBoards.get((this.playerID + 1) % 2).areAllShipsSunk())
+        {
+            message = "Congratulations, you have sunk your opponent's fleet. You win!";
+        }
+        Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
+        alert.showAndWait();
+        Platform.exit();
+    }
+    
     enum GamePhase
     {
         MATCHMAKING,
@@ -624,9 +649,6 @@ public  class GraphicalClient extends Application
     
     private void UpdateGamePhase(GamePhase phase)
     {
-        //TODO
-        //update game based on phase
-        //disable/enable buttons, listners, etc.
         this.phase = phase;
         UpdatePrompt();
         switch (phase)
@@ -698,9 +720,9 @@ public  class GraphicalClient extends Application
                 }
             }
         }
+        this.playerID = this.gameInterface.registerPlayer();
         Platform.runLater( () ->
         {
-            this.playerID = this.gameInterface.registerPlayer();
             UpdateGamePhase(GamePhase.MATCHMAKING);
         });
     }

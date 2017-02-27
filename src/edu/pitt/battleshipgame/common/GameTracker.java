@@ -81,7 +81,12 @@ public class GameTracker {
     public void beatHeart(int playerID)
     {
         this.lastHeartBeat[playerID] = System.nanoTime();
+        if (this.beatCount[playerID] == 1 && this.beatCount[(playerID + 1) % 2] == 2)
+        {
+            this.lastHeartBeat[(playerID + 1) % 2] = System.nanoTime();
+        }
         ++this.beatCount[playerID];
+        System.out.println(playerID + "'s heart beat.");
     }
     
     public List<Board> getBoards() {
