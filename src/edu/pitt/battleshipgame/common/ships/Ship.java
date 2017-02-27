@@ -35,13 +35,24 @@ public abstract class Ship implements Serializable {
     
     public List<Coordinate> getCoordinates() {
         LinkedList coordinates = new LinkedList<Coordinate>();
+        
         if (start.getRow() == end.getRow()) {
             // This ship is oriented column wise
+            if(start.getCol() > end.getCol()){
+                Coordinate temp = start;
+                start = end;
+                end = temp;
+            }
             for (int i = start.getCol(); i <= end.getCol(); i++) {
                 coordinates.add(new Coordinate(start.getRow(),i));
             }
         } else {
             // This ship is oriented length wise
+            if(start.getRow() > end.getRow()){
+                Coordinate temp = start;
+                start = end;
+                end = temp;
+            }
             for (int i = start.getRow(); i <= end.getRow(); i++) {
                 coordinates.add(new Coordinate(i, start.getCol()));
             }

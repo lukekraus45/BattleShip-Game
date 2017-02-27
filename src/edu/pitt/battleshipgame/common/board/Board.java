@@ -53,7 +53,10 @@ public class Board implements Serializable {
     
     public Ship makeMove(Coordinate move) {
         this.lastMove = move;
+        //System.out.println("COL " + move.getCol());
+        //System.out.println("ROW " + move.getRow());
         moves[move.getCol()][move.getRow()] = true;
+        
         Ship ship = theShips[move.getCol()][move.getRow()];
         if(ship != null) {
             ship.registerHit();
@@ -106,14 +109,22 @@ public class Board implements Serializable {
         }
         for (int row = 0; row < BOARD_DIM; row++) {
             for (int col = 0; col < BOARD_DIM; col++) {
-                if (moves[row][col]) {
-                    if (theShips[row][col] != null) {
+                
+                if (moves[col][row]) {
+                    if (theShips[col][row] != null) {
+                        //System.out.println("HIT");
+                        //System.out.println("Col + " + (col+1) + " Row " + (row+1) );
                         boardRepresentation[row+1][col+1] = 'X';
                     } else {
+                        //System.out.println("Miss");
+                        //System.out.println("Col + " + (col+1) + " Row " + (row+1) );
+
                         boardRepresentation[row+1][col+1] = 'O';
                     }
+                }else{
+                    boardRepresentation[row+1][col+1] = ' ';
                 }
-                if (showShips && theShips[row][col] != null) {
+                if (showShips && theShips[col][row] != null) {
                     boardRepresentation[row+1][col+1] = 'S';
                 }
             }

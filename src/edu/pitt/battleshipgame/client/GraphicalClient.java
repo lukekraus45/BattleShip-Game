@@ -216,8 +216,10 @@ public  class GraphicalClient extends Application
             this.ships.values().forEach((ship) ->
             {
                 this.gameBoards.get(this.playerID).addShip(ship);
+                
             });
             gameInterface.setBoards(this.gameBoards);
+            System.out.println(this.gameBoards.get(playerID).toString(true));
             Wait();
         });
     }
@@ -316,6 +318,7 @@ public  class GraphicalClient extends Application
         {
             Coordinate finalPlacementCoordinate = new Coordinate(row, col);
             Ship ship = ShipFactory.newShipFromType(this.currentlyPlacing, this.initialPlacementCoordinate, finalPlacementCoordinate);
+            
             if (ship.isValid() && PlacementValid(this.initialPlacementCoordinate, finalPlacementCoordinate))
             {
                 this.ships.put(this.currentlyPlacing, ship);
@@ -499,19 +502,26 @@ public  class GraphicalClient extends Application
     
     private void Fire(int row, int col)
     {
+        System.out.println("PID " + this.playerID);
+        System.out.println("Pleyer ID " + (((this.playerID + 1)%2)));
         Board theirGameBoard = this.gameBoards.get((this.playerID + 1) % 2);
+        System.out.println(theirGameBoard.toString());
         if (!theirGameBoard.getMoves()[col][row]) //Board class uses column then row
         {
-            System.out.println(theirGameBoard.getShipList().size());
+            //System.out.println(theirGameBoard.getShipList().size());
+            //System.out.println(theirGameBoard.toString());
+            
             Ship shipHit = theirGameBoard.makeMove(new Coordinate(row, col));
             this.gameInterface.setBoards(this.gameBoards);
             if (shipHit != null)
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.HIT, row, col);
+                System.out.println(theirGameBoard.toString());
             }
             else
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
+                System.out.println(theirGameBoard.toString());
             }
             UpdateGamePhase(GamePhase.WAITING);
             Wait();
