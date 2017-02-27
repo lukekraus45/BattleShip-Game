@@ -56,6 +56,7 @@ public  class GraphicalClient extends Application
     private GameInterface gameInterface;
     private int playerID;
     private ArrayList<Board> gameBoards;
+    private ArrayList<Board> oldGameBoards = null;
     private Pane[][] ourCells;
     private Pane[][] theirCells;
     private HashMap<Ship.ShipType, Button> shipButtons;
@@ -250,6 +251,7 @@ public  class GraphicalClient extends Application
     {
         this.gameInterface.wait(this.playerID);
         this.gameBoards = this.gameInterface.getBoards();
+        CheckIfShipsSunk();
         if (this.gameInterface.isGameOver())
         {
             Platform.runLater( () ->
@@ -303,10 +305,10 @@ public  class GraphicalClient extends Application
     
     private void RemoveShipButtonListeners()
     {
-        for (HashMap.Entry entry : this.shipButtons.entrySet())
+        this.shipButtons.entrySet().forEach((entry) ->
         {
             ((Button)entry.getValue()).setOnAction(null);
-        }
+        });
     }
     
     private void ShipButtonClicked(Ship.ShipType type)
@@ -527,6 +529,7 @@ public  class GraphicalClient extends Application
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
             }
+            CheckIfShipsSunk();
             if (this.gameInterface.isGameOver())
             {
                 GameOver();
@@ -560,6 +563,37 @@ public  class GraphicalClient extends Application
         menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
         menuBar.getMenus().add(file);
         return menuBar;
+    }
+    
+    private void CheckIfShipsSunk()
+    {
+        if (this.oldGameBoards != null)
+        {
+            for (int player = 0; player < 2; player++)
+            {
+                for (int ship = 0; ship < this.gameBoards.get(0).getShipList().size(); ship++)
+                {
+                    if (this.gameBoards.get(player).getShipList().get(ship).isSunk() != 
+                            this.oldGameBoards.get(player).getShipList().get(ship).isSunk())
+                    {
+                        final int id = player;
+                        final String shipName = this.gameBoards.get(player).getShipList().get(ship).getName();
+                        Platform.runLater( () ->
+                        {
+                            SinkAlert(id, shipName);
+                        });
+                    }
+                }
+            }
+        }
+        this.oldGameBoards = this.gameBoards;
+    }
+    
+    private void SinkAlert(int player, String shipName)
+    {
+        String message = "Your " + (player == this.playerID ? "" : " opponent's ") + shipName + " has been sunk.";
+        Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
+        alert.showAndWait();
     }
     
     private void surrender(ActionEvent e)
