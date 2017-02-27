@@ -251,7 +251,10 @@ public  class GraphicalClient extends Application
     {
         this.gameInterface.wait(this.playerID);
         this.gameBoards = this.gameInterface.getBoards();
-        CheckIfShipsSunk();
+        Platform.runLater( () ->
+        {
+            CheckIfShipsSunk();
+        });
         if (this.gameInterface.isGameOver())
         {
             Platform.runLater( () ->
@@ -524,12 +527,12 @@ public  class GraphicalClient extends Application
             if (shipHit != null)
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.HIT, row, col);
+                CheckIfShipsSunk();
             }
             else
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
             }
-            CheckIfShipsSunk();
             if (this.gameInterface.isGameOver())
             {
                 GameOver();
@@ -578,20 +581,17 @@ public  class GraphicalClient extends Application
                     {
                         final int id = player;
                         final String shipName = this.gameBoards.get(player).getShipList().get(ship).getName();
-                        Platform.runLater( () ->
-                        {
-                            SinkAlert(id, shipName);
-                        });
+                        SinkAlert(id, shipName);
                     }
                 }
             }
         }
-        this.oldGameBoards = this.gameBoards;
+        this.oldGameBoards = this.gameInterface.getBoards();
     }
     
     private void SinkAlert(int player, String shipName)
     {
-        String message = "Your " + (player == this.playerID ? "" : " opponent's ") + shipName + " has been sunk.";
+        String message = "Your " + (player == this.playerID ? "" : "opponent's ") + shipName + " has been sunk.";
         Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
         alert.showAndWait();
     }
