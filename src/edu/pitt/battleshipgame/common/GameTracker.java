@@ -11,12 +11,16 @@ public class GameTracker {
     private ArrayList<Board> gameBoards;
     private GameState state = GameState.INIT;
     private int playerTurn = 0;
+    private long[] lastHeartBeat;
+    private int[] beatCount;
     Object lock;
     
     public GameTracker() {
         // Exists to protect this object from direct instantiation
         lock = new Object();
         gameBoards = new ArrayList<Board>(MAX_PLAYERS);
+        this.lastHeartBeat = new long[MAX_PLAYERS];
+        this.beatCount = new int[MAX_PLAYERS];
         System.out.println("Server constructed.");
     }
 
@@ -50,7 +54,7 @@ public class GameTracker {
             }
             case PLAYING:
             {
-                while(playerTurn != playerID) {
+                while(playerTurn != playerID || beatCount[0] + beatCount[1] < 4) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -62,6 +66,22 @@ public class GameTracker {
             default:
                 break;
         }
+    }
+    
+    public boolean hasBeatingHeart(int playerID)
+    {
+        if ((beatCount[playerID] >= 2 && beatCount[(playerID + 1) % 2] < 2) || beatCount[0] == 0 || beatCount[1] == 0)
+        {
+            return true;
+        }
+        long timeoutAmount = this.beatCount[playerID] == 1 ? ((long)120 * (long)1000000000) : ((long)30 * (long)1000000000);
+        return (System.nanoTime() - this.lastHeartBeat[playerID]) < timeoutAmount;
+    }
+    
+    public void beatHeart(int playerID)
+    {
+        this.lastHeartBeat[playerID] = System.nanoTime();
+        ++this.beatCount[playerID];
     }
     
     public List<Board> getBoards() {

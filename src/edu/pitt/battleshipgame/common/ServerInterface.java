@@ -19,4 +19,6 @@ public interface ServerInterface {
     @WebMethod boolean isGameOver();
     @WebMethod boolean bothUsersConnected();
     @WebMethod void player_leave();
+    @WebMethod void beatHeart(int id);
+    @WebMethod boolean hasBeatingHeart(int id);
 }
