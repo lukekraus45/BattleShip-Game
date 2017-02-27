@@ -70,6 +70,10 @@ public class GameTracker {
     
     public boolean hasBeatingHeart(int playerID)
     {
+        if ((beatCount[playerID] >= 2 && beatCount[(playerID + 1) % 2] < 2) || beatCount[0] == 0 || beatCount[1] == 0)
+        {
+            return true;
+        }
         long timeoutAmount = this.beatCount[playerID] == 1 ? ((long)120 * (long)1000000000) : ((long)30 * (long)1000000000);
         return (System.nanoTime() - this.lastHeartBeat[playerID]) < timeoutAmount;
     }

@@ -568,6 +568,15 @@ public  class GraphicalClient extends Application
         Platform.exit();
     }
     
+    private void Timeout()
+    {
+        final String message = "You took too long and the game timed out. You lose.";
+        Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
+        alert.showAndWait();
+        this.gameInterface.player_leave();
+        Platform.exit();
+    }
+    
     private void surrender_event()
     {
         final String surrenderText = "The other user has surrendered. You win.";
@@ -717,6 +726,14 @@ public  class GraphicalClient extends Application
                         Platform.runLater( () ->
                         {
                             OpponentConnectionLost();
+                        });
+                        return;
+                    }
+                    if (!this.gameInterface.hasBeatingHeart(this.playerID))
+                    {
+                        Platform.runLater( () ->
+                        {
+                            Timeout();
                         });
                         return;
                     }
