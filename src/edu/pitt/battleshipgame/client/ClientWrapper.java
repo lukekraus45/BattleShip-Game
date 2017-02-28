@@ -14,10 +14,10 @@ public class ClientWrapper implements GameInterface {
     ServerInterface serverInterface = null;
     int myPlayerID;
 
-    private static ServerInterface getServer() {
+    private static ServerInterface getServer(String address) {
         URL url = null;
         try {
-            url = new URL("http://localhost:9999/battleship?wsdl");
+            url = new URL("http://" + address + ":9999/battleship?wsdl");
         } catch (MalformedURLException e) {
             System.err.println(e);
         }
@@ -26,8 +26,8 @@ public class ClientWrapper implements GameInterface {
         return service.getPort(ServerInterface.class);
     }
     
-    public ClientWrapper() {
-        serverInterface = getServer();
+    public ClientWrapper(String address) {
+        serverInterface = getServer(address);
     }
     
     @Override

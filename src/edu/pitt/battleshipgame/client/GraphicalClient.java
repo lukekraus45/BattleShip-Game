@@ -9,6 +9,7 @@ import edu.pitt.battleshipgame.common.ships.Ship;
 import edu.pitt.battleshipgame.common.ships.ShipFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -75,14 +77,15 @@ public  class GraphicalClient extends Application
         this.primaryStage = primaryStage;
         initialize();
         this.primaryStage.show();
-        RunGetServerTask();
+        String serverAddress = GetServerAddress();
+        RunGetServerTask(serverAddress);
     }
     
-    private void RunGetServerTask()
+    private void RunGetServerTask(String address)
     {
         Task task = new Task<Void>() {
             @Override public Void call() {
-                ConnectToServer();
+                ConnectToServer(address);
                 WaitForMatch();
                 CheckOpponentConnection();
                 return null;
@@ -613,6 +616,20 @@ public  class GraphicalClient extends Application
         }
     }
     
+    private String GetServerAddress()
+    {
+        String address = "";
+        TextInputDialog dialog = new TextInputDialog("0.0.0.0");
+        dialog.setTitle("Enter server address");
+        dialog.setContentText("Please enter the address of the server");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent())
+        {
+            address = result.get();
+        }
+        return address;
+    }
+    
     private void OpponentConnectionLost()
     {
         final String message = "The other player has taken too long to respond to the server, you win.";
@@ -728,13 +745,13 @@ public  class GraphicalClient extends Application
         }
     }
   
-    private void ConnectToServer()
+    private void ConnectToServer(String address)
     {
         while (true)
         {
             try
             {
-                this.gameInterface = new ClientWrapper();
+                this.gameInterface = new ClientWrapper(address);
                 break;
             }
             catch (Throwable causeGot)
