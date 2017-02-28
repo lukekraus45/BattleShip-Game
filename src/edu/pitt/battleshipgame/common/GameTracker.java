@@ -14,6 +14,7 @@ public class GameTracker {
     private long[] lastHeartBeat;
     private int[] beatCount;
     private final Object lock;
+    private int playerEverConnected = 0;
     
     public GameTracker() {
         // Exists to protect this object from direct instantiation
@@ -26,11 +27,12 @@ public class GameTracker {
 
     public int registerPlayer() throws TooManyPlayersException {
         synchronized(lock) {
-            if (registeredPlayers >= 2)
+            if (this.playerEverConnected >= 2)
             {
                 throw new TooManyPlayersException();
             }
             registeredPlayers++;
+            this.playerEverConnected++;
             gameBoards.add(new Board("Player " + (registeredPlayers - 1) + " board"));
         }
         return registeredPlayers - 1;

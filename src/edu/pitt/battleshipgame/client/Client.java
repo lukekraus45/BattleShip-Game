@@ -17,7 +17,7 @@ public class Client {
     public static void main(String [] args) {
         
        
-        gi = new ClientWrapper();
+        //gi = new ClientWrapper();
         //myPlayerID = gi.registerPlayer();
         
         System.out.println("You have registered as Player " + myPlayerID);
