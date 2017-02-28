@@ -13,7 +13,7 @@ public class GameTracker {
     private int playerTurn = 0;
     private long[] lastHeartBeat;
     private int[] beatCount;
-    Object lock;
+    private final Object lock;
     
     public GameTracker() {
         // Exists to protect this object from direct instantiation
@@ -115,13 +115,5 @@ public class GameTracker {
             }
         }
         return false;
-    }
-
-    public static class TooManyPlayersException extends Exception
-    {
-
-        public TooManyPlayersException()
-        {
-        }
     }
 }

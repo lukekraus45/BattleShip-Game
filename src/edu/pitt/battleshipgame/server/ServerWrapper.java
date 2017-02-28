@@ -9,6 +9,7 @@ import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.Serializer;
 import edu.pitt.battleshipgame.common.GameTracker;
 import edu.pitt.battleshipgame.common.ServerInterface;
+import edu.pitt.battleshipgame.common.TooManyPlayersException;
 
 //Service Implementation
 @WebService(endpointInterface = "edu.pitt.battleshipgame.common.ServerInterface")
@@ -36,7 +37,7 @@ public class ServerWrapper implements ServerInterface {
      * @return The id of the registered player.
      */
     @Override
-    public int registerPlayer() throws GameTracker.TooManyPlayersException {
+    public int registerPlayer() throws TooManyPlayersException {
         return tracker.registerPlayer();
     }
 

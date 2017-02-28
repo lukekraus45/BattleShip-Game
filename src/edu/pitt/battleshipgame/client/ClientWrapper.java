@@ -31,7 +31,7 @@ public class ClientWrapper implements GameInterface {
     }
     
     @Override
-    public int registerPlayer() throws GameTracker.TooManyPlayersException {
+    public int registerPlayer() throws TooManyPlayersException {
         return serverInterface.registerPlayer();
     }
     

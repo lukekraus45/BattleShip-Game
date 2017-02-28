@@ -4,7 +4,7 @@ import edu.pitt.battleshipgame.common.board.*;
 import java.util.ArrayList;
 
 public interface GameInterface {
-    int registerPlayer() throws GameTracker.TooManyPlayersException;
+    int registerPlayer() throws TooManyPlayersException;
     void wait(int playerID);
     ArrayList<Board> getBoards();
     void setBoards(ArrayList<Board> boards);

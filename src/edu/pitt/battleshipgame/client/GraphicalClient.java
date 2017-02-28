@@ -2,6 +2,7 @@ package edu.pitt.battleshipgame.client;
 
 import edu.pitt.battleshipgame.common.GameInterface;
 import edu.pitt.battleshipgame.common.GameTracker;
+import edu.pitt.battleshipgame.common.TooManyPlayersException;
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.board.Coordinate;
 import edu.pitt.battleshipgame.common.ships.Ship;
@@ -765,7 +766,7 @@ public  class GraphicalClient extends Application
         {
             this.playerID = this.gameInterface.registerPlayer();
         }
-        catch (GameTracker.TooManyPlayersException e)
+        catch (TooManyPlayersException e)
         {
             Platform.runLater( () ->
             {
