@@ -36,7 +36,7 @@ public class ServerWrapper implements ServerInterface {
      * @return The id of the registered player.
      */
     @Override
-    public int registerPlayer() {
+    public int registerPlayer() throws GameTracker.TooManyPlayersException {
         return tracker.registerPlayer();
     }
 

@@ -1,6 +1,7 @@
 package edu.pitt.battleshipgame.client;
 
 import edu.pitt.battleshipgame.common.GameInterface;
+import edu.pitt.battleshipgame.common.GameTracker;
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.board.Coordinate;
 import edu.pitt.battleshipgame.common.ships.Ship;
@@ -629,6 +630,14 @@ public  class GraphicalClient extends Application
         Platform.exit();
     }
     
+    private void ServerFull()
+    {
+        final String message = "The server is at capacity. You cannot play.";
+        Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
+        alert.showAndWait();
+        Platform.exit();
+    }
+    
     private void surrender_event()
     {
         final String surrenderText = "The other user has surrendered. You win.";
@@ -752,7 +761,17 @@ public  class GraphicalClient extends Application
                 }
             }
         }
-        this.playerID = this.gameInterface.registerPlayer();
+        try
+        {
+            this.playerID = this.gameInterface.registerPlayer();
+        }
+        catch (GameTracker.TooManyPlayersException e)
+        {
+            Platform.runLater( () ->
+            {
+                ServerFull();
+            });
+        }
         Platform.runLater( () ->
         {
             UpdateGamePhase(GamePhase.MATCHMAKING);
@@ -761,8 +780,10 @@ public  class GraphicalClient extends Application
     
     private void WaitForMatch()
     {
+        System.out.println("Player " + this.playerID + " waiting for match");
         this.gameInterface.wait(this.playerID);
         this.gameInterface.beatHeart(this.playerID);
+        System.out.println("Player " + this.playerID + " got match");
 
         Platform.runLater( () ->
         {

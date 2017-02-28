@@ -18,7 +18,7 @@ public class Client {
         
        
         gi = new ClientWrapper();
-        myPlayerID = gi.registerPlayer();
+        //myPlayerID = gi.registerPlayer();
         
         System.out.println("You have registered as Player " + myPlayerID);
         System.out.println("Please wait for other players to join");

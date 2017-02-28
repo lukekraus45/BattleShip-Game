@@ -117,7 +117,7 @@ public class GameTracker {
         return false;
     }
 
-    private static class TooManyPlayersException extends Exception
+    public static class TooManyPlayersException extends Exception
     {
 
         public TooManyPlayersException()

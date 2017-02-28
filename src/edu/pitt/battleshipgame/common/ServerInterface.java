@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @WebService
 @SOAPBinding(style = Style.RPC)
 public interface ServerInterface {
-    @WebMethod int registerPlayer();
+    @WebMethod int registerPlayer() throws GameTracker.TooManyPlayersException;
     @WebMethod void wait(int playerID);
     @WebMethod byte [] getBoards();
     @WebMethod void setBoards(byte [] boards);
