@@ -24,8 +24,12 @@ public class GameTracker {
         System.out.println("Server constructed.");
     }
 
-    public int registerPlayer() {
+    public int registerPlayer() throws TooManyPlayersException {
         synchronized(lock) {
+            if (registeredPlayers >= 2)
+            {
+                throw new TooManyPlayersException();
+            }
             registeredPlayers++;
             gameBoards.add(new Board("Player " + (registeredPlayers - 1) + " board"));
         }
@@ -111,5 +115,13 @@ public class GameTracker {
             }
         }
         return false;
+    }
+
+    private static class TooManyPlayersException extends Exception
+    {
+
+        public TooManyPlayersException()
+        {
+        }
     }
 }
