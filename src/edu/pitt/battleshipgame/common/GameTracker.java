@@ -15,6 +15,7 @@ public class GameTracker {
     private int[] beatCount;
     private Object lock;
     private int playerEverConnected = 0;
+    private boolean[] playerInited;
     
     public GameTracker() {
         // Exists to protect this object from direct instantiation
@@ -31,6 +32,9 @@ public class GameTracker {
         registeredPlayers = 0;
         state = GameState.INIT;
         playerEverConnected = 0;
+        playerInited = new boolean[2];
+        playerInited[0] = false;
+        playerInited[1] = false;
     }
 
     public int registerPlayer() throws TooManyPlayersException {
@@ -68,7 +72,11 @@ public class GameTracker {
                         System.err.println(e + " I can't sleep!");
                     }
                 }
-                state = GameState.PLAYING;
+                playerInited[playerID] = true;
+                if (playerInited[0] && playerInited[1])
+                {
+                    state = GameState.PLAYING;
+                }
                 break;
             }
             case PLAYING:
