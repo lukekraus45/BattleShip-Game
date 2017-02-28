@@ -1,9 +1,7 @@
 package edu.pitt.battleshipgame.server;
 
 import javax.jws.WebService;
-import javax.xml.ws.WebServiceProvider;
 import java.util.ArrayList;
-import java.util.List;
 
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.Serializer;
@@ -66,10 +64,6 @@ public class ServerWrapper implements ServerInterface {
      * The Network version of @see Server.registerBoard. It will convert the
      * byte [] board to a Board object to be passed to the Server.
      * 
-     * @param playerID The ID of the player registering a board.
-     * 
-     * @param board The serialized representation of the board the player wants
-     *              to register.
      */
     @Override
     public void setBoards(byte [] boards) {

@@ -13,19 +13,32 @@ public class GameTracker {
     private int playerTurn = 0;
     private long[] lastHeartBeat;
     private int[] beatCount;
-    private final Object lock;
+    private Object lock;
     private int playerEverConnected = 0;
     
     public GameTracker() {
         // Exists to protect this object from direct instantiation
+        initialize();
+        System.out.println("Server constructed.");
+    }
+    
+    private void initialize()
+    {
         lock = new Object();
         gameBoards = new ArrayList<Board>(MAX_PLAYERS);
         this.lastHeartBeat = new long[MAX_PLAYERS];
         this.beatCount = new int[MAX_PLAYERS];
-        System.out.println("Server constructed.");
+        registeredPlayers = 0;
+        state = GameState.INIT;
+        playerEverConnected = 0;
     }
 
     public int registerPlayer() throws TooManyPlayersException {
+        if (((this.beatCount[0] != 0 || beatCount[1] != 0) && (!hasBeatingHeart(0) && !hasBeatingHeart(1))) ||
+                (this.beatCount[0] > 0 && this.beatCount[1] > 0 && this.registeredPlayers < 2))
+        {
+            initialize();
+        }
         synchronized(lock) {
             if (this.playerEverConnected >= 2)
             {
@@ -92,7 +105,6 @@ public class GameTracker {
             this.lastHeartBeat[(playerID + 1) % 2] = System.nanoTime();
         }
         ++this.beatCount[playerID];
-        System.out.println(playerID + "'s heart beat.");
     }
     
     public List<Board> getBoards() {
