@@ -5,9 +5,6 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 
-import edu.pitt.battleshipgame.common.board.*;
-import java.util.ArrayList;
-
 //Service Endpoint Interface
 @WebService
 @SOAPBinding(style = Style.RPC)

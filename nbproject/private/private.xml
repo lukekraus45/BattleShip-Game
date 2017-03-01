@@ -5,12 +5,12 @@
         <group>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/client/ClientWrapper.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/board/Board.java</file>
+            <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/client/GraphicalClient.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/GameInterface.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/endpoint/ServerPublisher.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/server/ServerWrapper.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ServerInterface.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/ships/Ship.java</file>
-            <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/client/Client.java</file>
             <file>file:/C:/Users/ben/Documents/Projects/CS_1632_31078_group9/src/edu/pitt/battleshipgame/common/GameTracker.java</file>
         </group>
     </open-files>

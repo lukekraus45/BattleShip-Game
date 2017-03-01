@@ -46,6 +46,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javax.xml.ws.WebServiceException;
 
 public  class GraphicalClient extends Application
 {
@@ -216,61 +217,82 @@ public  class GraphicalClient extends Application
     {
         this.doneButton.setOnAction((ActionEvent event) ->
         {
-            UpdateGamePhase(GamePhase.WAITING);
-            this.gameBoards = this.gameInterface.getBoards();
-            this.ships.values().forEach((ship) ->
+            try
             {
-                this.gameBoards.get(this.playerID).addShip(ship);
+                UpdateGamePhase(GamePhase.WAITING);
+                this.gameBoards = this.gameInterface.getBoards();
+                this.ships.values().forEach((ship) ->
+                {
+                    this.gameBoards.get(this.playerID).addShip(ship);
+                    
+                });
+
+                this.gameInterface.setBoards(this.gameBoards);
+                this.gameInterface.beatHeart(this.playerID);
                 
-            });
-
-            this.gameInterface.setBoards(this.gameBoards);
-            this.gameInterface.beatHeart(this.playerID);
-
-            Wait();
+                Wait();
+            }
+            catch (WebServiceException ex)
+            {
+                ServerLost();
+            }
         });
     }
     
     private void Wait()
     {
-        if (!this.gameInterface.isGameOver())
+        try
         {
-            Task task = new Task<Void>() {
-                @Override public Void call() {
-                    WaitForOpponent();
-                    return null;
-                }
-            };
-            Thread thread = new Thread(task);
-            thread.setDaemon(true);
-            thread.start();
+            if (!this.gameInterface.isGameOver())
+            {
+                Task task = new Task<Void>() {
+                    @Override public Void call() {
+                        WaitForOpponent();
+                        return null;
+                    }
+                };
+                Thread thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
+            }
+            else
+            {
+                //TODO game is over
+            }
         }
-        else
+        catch (WebServiceException ex)
         {
-            //TODO game is over
+            ServerLost();
         }
     }
     
     private void WaitForOpponent()
     {
-        this.gameInterface.wait(this.playerID);
-        this.gameBoards = this.gameInterface.getBoards();
-        if (this.gameInterface.isGameOver())
+        try
         {
-            Platform.runLater( () ->
+            this.gameInterface.wait(this.playerID);
+            this.gameBoards = this.gameInterface.getBoards();
+            if (this.gameInterface.isGameOver())
             {
-                CheckIfShipsSunk();
-                GameOver();
-            });
+                Platform.runLater( () ->
+                {
+                    CheckIfShipsSunk();
+                    GameOver();
+                });
+            }
+            else
+            {
+                Platform.runLater( () ->
+                {
+                    CheckIfShipsSunk();
+                    UpdateBoards();
+                    UpdateGamePhase(GamePhase.FIRING);
+                });
+            }
         }
-        else
+        catch (WebServiceException e)
         {
-            Platform.runLater( () ->
-            {
-                CheckIfShipsSunk();
-                UpdateBoards();
-                UpdateGamePhase(GamePhase.FIRING);
-            });
+            ServerLost();
         }
     }
     
@@ -348,7 +370,7 @@ public  class GraphicalClient extends Application
             else if (!ship.isValid())
             {
                 String message = "Hey!!! What are you doing!? The "
-                        + ship.getName() + " is " + ship.getLength() + " cells long. Come on, you know that";
+                        + ship.getName() + " is " + ship.getLength() + " cells long. Come on, you know that.";
                 Alert wrongLength = new Alert(AlertType.ERROR, message, ButtonType.OK);
                 wrongLength.show();
             }
@@ -524,8 +546,15 @@ public  class GraphicalClient extends Application
         if (!theirGameBoard.getMoves()[col][row]) //Board class uses column then row
         {
             Ship shipHit = theirGameBoard.makeMove(new Coordinate(row, col));
-            this.gameInterface.setBoards(this.gameBoards);
-            this.gameInterface.beatHeart(this.playerID);
+            try
+            {
+                this.gameInterface.setBoards(this.gameBoards);
+                this.gameInterface.beatHeart(this.playerID);
+            }
+            catch (WebServiceException e)
+            {
+                ServerLost();
+            }
             if (shipHit != null)
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.HIT, row, col);
@@ -535,14 +564,21 @@ public  class GraphicalClient extends Application
             {
                 this.theirBoard.setCellType(GraphicalBoard.CellType.MISS, row, col);
             }
-            if (this.gameInterface.isGameOver())
+            try
             {
-                GameOver();
+                if (this.gameInterface.isGameOver())
+                {
+                    GameOver();
+                }
+                else
+                {
+                    UpdateGamePhase(GamePhase.WAITING);
+                    Wait();
+                }
             }
-            else
+            catch (WebServiceException e)
             {
-                UpdateGamePhase(GamePhase.WAITING);
-                Wait();
+                ServerLost();
             }
         }
         else
@@ -588,7 +624,14 @@ public  class GraphicalClient extends Application
                 }
             }
         }
-        this.oldGameBoards = this.gameInterface.getBoards();
+        try
+        {
+            this.oldGameBoards = this.gameInterface.getBoards();
+        }
+        catch (WebServiceException ex)
+        {
+            ServerLost();
+        }
     }
     
     private void SinkAlert(int player, String shipName)
@@ -610,7 +653,14 @@ public  class GraphicalClient extends Application
         else if (confirm.getResult() == ButtonType.OK)
         {
             //alert the other user that the opponent has surrendered
-            gameInterface.player_leave();
+            try
+            {
+                gameInterface.player_leave();
+            }
+            catch (WebServiceException ex)
+            {
+                ServerLost();
+            }
             Platform.exit();//exit 
         }
     }
@@ -634,7 +684,14 @@ public  class GraphicalClient extends Application
         final String message = "The other player has taken too long to respond to the server, you win.";
         Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
         alert.showAndWait();
-        this.gameInterface.player_leave();
+        try
+        {
+            this.gameInterface.player_leave();
+        }
+        catch (WebServiceException ex)
+        {
+            ServerLost();
+        }
         Platform.exit();
     }
     
@@ -643,7 +700,14 @@ public  class GraphicalClient extends Application
         final String message = "You took too long and the game timed out. You lose.";
         Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
         alert.showAndWait();
-        this.gameInterface.player_leave();
+        try
+        {
+            this.gameInterface.player_leave();
+        }
+        catch (WebServiceException ex)
+        {
+            ServerLost();
+        }
         Platform.exit();
     }
     
@@ -655,13 +719,31 @@ public  class GraphicalClient extends Application
         Platform.exit();
     }
     
+    private void ServerLost()
+    {
+        Platform.runLater( () ->
+        {
+            final String message = "We seem to have misplaced the server. We'll call the match a draw.";
+            Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
+            alert.showAndWait();
+            Platform.exit();
+        });
+    }
+    
     private void surrender_event()
     {
         final String surrenderText = "The other user has surrendered. You win.";
         Alert confirm = new Alert(AlertType.INFORMATION, surrenderText, ButtonType.OK);
         confirm.showAndWait();
-        //alert the other user that the opponent has surrendered
-        gameInterface.player_leave();
+        try
+        {
+            //alert the other user that the opponent has surrendered
+            gameInterface.player_leave();
+        }
+        catch (WebServiceException ex)
+        {
+            ServerLost();
+        }
         Platform.exit();//exit 
     }
     
@@ -789,6 +871,10 @@ public  class GraphicalClient extends Application
                 ServerFull();
             });
         }
+        catch (WebServiceException e)
+        {
+            ServerLost();
+        }
         Platform.runLater( () ->
         {
             UpdateGamePhase(GamePhase.MATCHMAKING);
@@ -797,9 +883,15 @@ public  class GraphicalClient extends Application
     
     private void WaitForMatch()
     {
-        this.gameInterface.wait(this.playerID);
-        this.gameInterface.beatHeart(this.playerID);
-
+        try
+        {
+            this.gameInterface.wait(this.playerID);
+            this.gameInterface.beatHeart(this.playerID);
+        }
+        catch (WebServiceException e)
+        {
+            ServerLost();
+        }
         Platform.runLater( () ->
         {
             UpdateGamePhase(GamePhase.PLACEMENT);
@@ -810,43 +902,51 @@ public  class GraphicalClient extends Application
     {
         while (true)
         {
-            if (this.gameInterface.bothUsersConnected())
+            try
             {
-                while (true)
+                if (this.gameInterface.bothUsersConnected())
                 {
-                    if (!this.gameInterface.bothUsersConnected())
+                    while (true)
                     {
-                        Platform.runLater( () ->
+                        if (!this.gameInterface.bothUsersConnected())
                         {
-                            surrender_event();
-                        });
-                        return;
-                    }
-                    if (!this.gameInterface.hasBeatingHeart((this.playerID + 1) % 2))
-                    {
-                        Platform.runLater( () ->
+                            Platform.runLater( () ->
+                            {
+                                surrender_event();
+                            });
+                            return;
+                        }
+                        if (!this.gameInterface.hasBeatingHeart((this.playerID + 1) % 2))
                         {
-                            OpponentConnectionLost();
-                        });
-                        return;
-                    }
-                    if (!this.gameInterface.hasBeatingHeart(this.playerID))
-                    {
-                        Platform.runLater( () ->
+                            Platform.runLater( () ->
+                            {
+                                OpponentConnectionLost();
+                            });
+                            return;
+                        }
+                        if (!this.gameInterface.hasBeatingHeart(this.playerID))
                         {
-                            Timeout();
-                        });
-                        return;
-                    }
-                    try
-                    {
-                        Thread.sleep(500);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        //do nothing
+                            Platform.runLater( () ->
+                            {
+                                Timeout();
+                            });
+                            return;
+                        }
+                        try
+                        {
+                            Thread.sleep(500);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            //do nothing
+                        }
                     }
                 }
+            }
+            catch (WebServiceException ex)
+            {
+                ServerLost();
+                break;
             }
             try
             {
