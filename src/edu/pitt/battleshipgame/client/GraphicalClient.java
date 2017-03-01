@@ -797,10 +797,8 @@ public  class GraphicalClient extends Application
     
     private void WaitForMatch()
     {
-        System.out.println("Player " + this.playerID + " waiting for match");
         this.gameInterface.wait(this.playerID);
         this.gameInterface.beatHeart(this.playerID);
-        System.out.println("Player " + this.playerID + " got match");
 
         Platform.runLater( () ->
         {
