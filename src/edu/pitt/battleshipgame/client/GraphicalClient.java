@@ -1,7 +1,6 @@
 package edu.pitt.battleshipgame.client;
 
 import edu.pitt.battleshipgame.common.GameInterface;
-import edu.pitt.battleshipgame.common.GameTracker;
 import edu.pitt.battleshipgame.common.TooManyPlayersException;
 import edu.pitt.battleshipgame.common.board.Board;
 import edu.pitt.battleshipgame.common.board.Coordinate;
