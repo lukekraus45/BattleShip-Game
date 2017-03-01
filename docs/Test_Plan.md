@@ -10,7 +10,7 @@ Basic requirement must be followed:
 
   * FUNC-3 Ship placement
 
-    * FUNC-3.1 Ship placement input format: Must be valid characters (A-J, 1-10), in correct format: [A-J]:[1-10]; both upper and lowecase are allowed. For example A:3, d:7.
+    * FUNC-3.1 Ship placement input format: Since we implemented a GUI, the user must select a ship from the button on the bottom of the client, and place it on "Your Board" by clicking once on a blue tile and then again on another blue tile.
 
     * FUNC-3.2 Ship number: Each player has 5 ships, 1 in each type: carrier, battleship, cruiser, submarine, destroyer.
 	
@@ -24,7 +24,7 @@ Basic requirement must be followed:
   
   * FUNC-4 Player's input during game
   
-	* FUNC-4.1 Player's fire must be valid: characters (A-J, 1-10), in correct format: [A-J]:[1-10]; both upper and lowecase are allowed. For example A:3, d:7.
+	* FUNC-4.1 Player's fire must be valid: Since we implemented a GUI, they need to click on a blue tile under the "Opponent's Board" section of the GUI.
 
     * FUNC-4.2 Player's turn: Player can only fire in his turn. Any input in oponent's turn must be ignored.
 
@@ -40,7 +40,7 @@ Basic requirement must be followed:
     
 	* FUNC-5.2 Ship sunk announcement: If all spaces in one ship are firedown, 2 players must be announced that ship has been destroyed. For example: Player 1 carrier has been destroyed.
     
-    * FUNC-5.3 Ship hit/miss announcement: If a fire hit a ship, both players must be announced that fire was a hit, otherwise they should be announced it was a miss.
+    * FUNC-5.3 Ship hit/miss announcement: If a fire hit a ship, both players must be announced that fire was a hit, otherwise they should be announced it was a miss. This announcement is made by showing a red square instead of a blue or grey one.
     
     * FUNC-5.4 Winner decision: If a player's all 5 ships has been destroyed, the game should announce a winner and finish.
 
@@ -387,11 +387,11 @@ TC-4.5a: Player exits game in progress - setup phase
   * Preconditions:
     * The game is in the setup phase.
   * Execution Steps:
-    * Use ctrl-c to exit player 0’s client
+    * Click file in the top left, then click on quit.
     * Start a stopwatch
   * Output Values:
     * Player 0’s client should exit, or type 'quit'
-    * Player 1’s client should display a message stating that the connection to player 0 was lost or that player 0 quit.
+    * Player 1’s client should display a message, after waiting for the timeout, stating that the connection to player 0 was lost or that player 0 quit.
   * Postconditions:
     * Player 0’s client is not running
     * Player 1’s client is in the matchmaking stage.
@@ -407,16 +407,46 @@ TC-4.5b: Player exits game in progress - firing phase
     * patrol boat F1 - F2
     * The game is in the firing phase.
   * Execution Steps:
-    * Use ctrl-c to exit player 0’s client, or type 'quit'
+    * Click file in the top left, then click on quit.
     * Start a stopwatch
   * Output Values:
     * Player 0’s client should exit.
-    * Player 1’s client should display a message stating that the connection to player 0 was lost or that player 0 quit.
+    * Player 1’s client should display a message, after waiting for the timeout, stating that the connection to player 0 was lost or that player 0 quit.
   * Postconditions:
     * Player 0’s client is not running
     * Player 1’s client is in the matchmaking stage.
 
-
+TC-4.5c: Player surrenders game in progress - setup phase
+  * Test Case: Tests what happens when a player surrenders their client during the setup phase.
+  * Preconditions:
+    * The game is in the setup phase.
+  * Execution Steps:
+    * Click file in the top left, then click on surrender.
+  * Output Values:
+    * Player 0’s client should exit.
+    * Player 1’s client should display a message stating that their victory.
+  * Postconditions:
+    * Player 0’s client is not running
+    * Player 1’s client is in the matchmaking stage.
+	
+TC-4.5c: Player surrenders game in progress - firing phase
+  * Test Case: Tests what happens when a player surrenders their client during the firing phase.
+  * Preconditions:
+    * Both players have  their ships placed as follows:
+    * carrier A1 - A5
+    * battleship B1 - B4
+    * destroyer C1 - C3
+    * submarine D1 - D3
+    * patrol boat F1 - F2
+    * The game is in the firing phase.
+  * Execution Steps:
+    * Click file in the top left, then click on surrender.
+  * Output Values:
+    * Player 0’s client should exit.
+    * Player 1’s client should display a message stating that their victory.
+  * Postconditions:
+    * Player 0’s client is not running
+    * Player 1’s client is in the matchmaking stage.
 ------------------------------------------------------------------------------
 ### TC-5.1 Ships placement must be finished before shooting phase
 
