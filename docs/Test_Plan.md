@@ -20,7 +20,7 @@ Basic requirement must be followed:
 
     * FUNC-3.5 Ships overlap: No parts/ spaces in any ships can overlap.
 
-    * FUNC-3.6 Ships out of bound: Ships must be placed inside board.
+    * FUNC-3.6 Ships out of bound: Ships must be placed inside board. The test case for this is removed as it it impossible to place a ship out of bounds on the GUI, as the ship can only be placed by clicking on a button.
   
   * FUNC-4 Player's input during game
   
@@ -105,18 +105,6 @@ TC-2a: Check board size 10x10
   * Output values: Expected a board with size 10x10 (A-J horizontal and 1-10 vertical) should be displayed in both game clients.
   * Post Condition: None
 
-------------------------------------------------------------------------------
-### TC-3.1 Ship placement valid input check
-
-TC-3.1: Invalid input in ship placement phase	
-  * Preconditions: 2 players are in ship placement phase, player 1 is placing carrier ship.
-  * Input values: Player 1 input invalid coordination
-  * Execution step:
-    * Invalid characters: #:1, N:4
-    * Invalid coordination: A:12
-    * Invalid format: 12:A
-  * Output values: System must display error and request Player 1 to re input coordination
-  * Post Condition:
 ------------------------------------------------------------------------------
 ### TC-3.2
 
@@ -271,46 +259,6 @@ TC-3.5d: 2 Ships In Same Cell Test (on top)
   * Postconditions:
     * Player 0 is able to keep placing ships.
     * Player 0 only has their carrier placed A1-A5
-
-------------------------------------------------------------------------------
-### TC-3.6 Ships out of bound
-
-TC-3a: Ship Placement Out of Bounds Diagonal Left Side Test
-  * Test Case: This test will attempt to place a ship in an out-of-bounds diagonal direction
-  * Preconditions:
-    * Ships are currently able to be placed
-  * Input Values:
-    * D3 : H(-1) for Carrier diagonal placement (J10:F10 for correct coordinate assuming first coordinates fail)
-    * D2 : G(-1) for Battleship diagonal placement (J9:G9 for correct coordinate assuming first coordinates fail)
-    * D1 : F(-1) for Destroyer diagonal placement (J8: H8 for correct coordinate assuming first coordinates fail)
-    * C1 : E(-1) for Submarine diagonal placement (J7:H7 for correct coordinate assuming first coordinates fail)
-    * B1 : C0 for Patrol Boat diagonal placement (J6:I6 for correct coordinate assuming first coordinates fail)
-  * Execution Steps
-    * Enter First Coordinate provided for the first ship
-    * Ensure that the game notifies the player of the error, citing “Out of Bounds” as the reason for the error
-      * Make note of ship type if the diagonal coordinates do not provide an error, as this is a problem
-    * Enter the valid coordinate for that ship to move on to the next ship type
-    * Repeat Step 1 through 4 with the next listed ship type
-  * Output Values: Game will alert player that this is an invalid ship placement, citing out of bounds as the reason for this error
-  * Postconditions: Ships will only have  been placed by entering the “correct coordinates” provided above. The game will then move to the next player’s ship placement phase (or if this is the second player, to the first player’s firing phase)
-    * TC-3b: Ship Placement Out of Bounds Diagonal Bottom Side Test
-    * Test Case: This test will attempt to place a ship in an out-of-bounds diagonal direction
-  * Preconditions:
-    * Ships are currently able to be placed
-  * Input Values:
-    * J5 : N1 for Carrier diagonal placement (A1:E1 for correct coordinate assuming first coordinates fail)
-    * J4 : M1 for Battleship diagonal placement (A2:D2 for correct coordinate assuming first coordinates fail)
-    * J3 : L1 for Destroyer diagonal placement (A3 : C3 for correct coordinate assuming first coordinates fail)
-    * J2 : L0 for Submarine diagonal placement (A4:C4 for correct coordinate assuming first coordinates fail)
-    * J1 : K0 for Patrol Boat diagonal placement (A5:B5 for correct coordinate assuming first coordinates fail)
-  * Execution Steps
-    * Enter First Coordinate provided for the first ship
-    * Ensure that the game notifies the player of the error, citing “Out of Bounds” as the reason for the error
-      * Make note of ship type if the diagonal coordinates do not provide an error, as this is a problem
-    * Enter the valid coordinate for that ship to move on to the next ship type
-    * Repeat Step 1 through 4 with the next listed ship type
-  * Output Values: Game will alert player that this is an invalid ship placement, citing out of bounds as the reason for this error
-  * Postconditions: Ships will only have * been placed by entering the “correct coordinates” provided above. The game will then move to the next player’s ship placement phase (or if this is the second player, to the first player’s firing phase)
 
 ------------------------------------------------------------------------------
 ### TC-4.1 Player's fire must be valid
